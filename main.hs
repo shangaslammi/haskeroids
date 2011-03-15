@@ -17,9 +17,8 @@ initializeWindow = do
     
 -- | Set up the initial OpenGL parameters
 initializeOpenGL = do
-    -- Disable depth and alpha checking as we won't be needing them
+    -- Disable depth checking as we won't be needing it in 2D
     depthMask $= Disabled
-    alphaFunc $= Nothing
     
     -- Nicer line and point drawing
     lineSmooth  $= Enabled
