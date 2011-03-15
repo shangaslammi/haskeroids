@@ -4,8 +4,13 @@ module Haskeroids.State (
     ) where
 
 import Haskeroids.Player
+import Haskeroids.Util
+import Haskeroids.Render (LineRenderable(..))
 
 data GameState = GameState { statePlayer :: Player }
+
+instance LineRenderable GameState where
+    lineSegments = stateLines
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -14,3 +19,6 @@ initialGameState = GameState {
 
 initialPlayerState :: Player
 initialPlayerState = Player (400, 300)
+
+stateLines :: GameState -> [LineSegment]
+stateLines = lineSegments . statePlayer
