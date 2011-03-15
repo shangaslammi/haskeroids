@@ -1,6 +1,7 @@
 module Haskeroids.State (
     GameState(..),
-    initialGameState
+    initialGameState,
+    renderGameState
     ) where
 
 import Haskeroids.Player
@@ -19,7 +20,11 @@ initialGameState = GameState {
     statePlayer = initialPlayerState
     }
 
--- | Initial state for the player ship
+-- | Render the given game state
+renderGameState :: GameState -> IO ()
+renderGameState = render
+    
+-- | Initial state for the player ship at center of the screen
 initialPlayerState :: Player
 initialPlayerState = Player (400, 300)
 
