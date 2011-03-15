@@ -2,6 +2,7 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
 import Haskeroids.State (initialGameState)
+import Haskeroids.Render (render)
 
 main = do
     initializeWindow
@@ -41,9 +42,10 @@ initializeOpenGL = do
 
 -- | Set up GLUT callbacks
 initializeCallbacks = do
-    displayCallback $= render initialGameState
+    displayCallback $= renderDisplay initialGameState
     
 -- | Render the display and swap buffers
-render st = do
+renderDisplay st = do
     clear [ColorBuffer]
+    render st
     swapBuffers
