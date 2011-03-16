@@ -20,10 +20,12 @@ initializeOpenGL = do
     -- Disable depth checking as we won't be needing it in 2D
     depthMask $= Disabled
     
-    -- Nicer line and point drawing
+    -- Nicer line drawing
     lineSmooth  $= Enabled
-    pointSmooth $= Enabled
-    
+    blend       $= Enabled
+    blendFunc   $= (SrcAlpha,OneMinusSrcAlpha)
+    lineWidth   $= 2.0    
+
     -- Set up viewport
     viewport   $= (Position 0 0, Size 800 600)
     
