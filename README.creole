@@ -4,3 +4,5 @@ Haskeroids is a game project imitating the classic Asteroids game, written in
 Haskell. I'm writing it in order to learn more about Haskell, especially in
 game programming context, and the code will be accompanied by a series of
 write-ups that detail my experiences in a sort of tutorial format.
+
+See the wiki for more details: https://github.com/shangaslammi/haskeroids/wiki
