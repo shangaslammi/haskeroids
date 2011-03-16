@@ -12,9 +12,8 @@ instance LineRenderable Player where
     lineSegments (Player {playerBody = b}) = map (transform b) $ shipLines
 
 instance Tickable Player where
-    tick (Player {playerBody = b}) = Player $ Body {
-        bodyPos = (bodyPos b),
-        bodyAngle = (bodyAngle b) + 0.1 }
+    tick (Player {playerBody = b@(Body {bodyAngle = a})}) = Player $ b {
+        bodyAngle = a + 0.1 }
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float
