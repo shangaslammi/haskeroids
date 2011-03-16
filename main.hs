@@ -8,4 +8,3 @@ main = do
     initializeCallbacks
     
     mainLoop
-
