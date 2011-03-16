@@ -1,13 +1,14 @@
 module Haskeroids.Player (Player(..)) where
 
 import Haskeroids.Geometry
+import Haskeroids.Geometry.Transform
 import Haskeroids.Render (LineRenderable(..))
 
 -- | Data type for tracking current player state
-data Player = Player { playerPos :: Vec2 }
+data Player = Player { playerBody :: Body }
 
 instance LineRenderable Player where
-    lineSegments (Player {playerPos = p}) = map (translateLine p) $ shipLines
+    lineSegments (Player {playerBody = b}) = map (transform b) $ shipLines
 
 -- | Constant for the ship size
 shipSize = 12.0 :: Float

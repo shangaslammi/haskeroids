@@ -19,15 +19,3 @@ polar m a = (m * sin a, m * (-cos a))
 pointsToSegments :: [Vec2] -> [LineSegment]
 pointsToSegments (p:p':[])     = [LineSegment (p,p')]
 pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
-
--- | Translate a point
-translate :: Vec2 -- ^ (x,y) delta
-          -> Vec2 -- ^ original point
-          -> Vec2 -- ^ translated point
-translate (x,y) (x',y') = (x+x', y+y')
-
--- | Translate a line segment
-translateLine :: Vec2 -> LineSegment -> LineSegment
-translateLine p (LineSegment (l,l')) = LineSegment (t l, t l')
-    where t = translate p
-    
