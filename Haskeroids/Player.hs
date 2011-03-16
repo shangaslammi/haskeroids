@@ -7,7 +7,7 @@ import Haskeroids.Render (LineRenderable(..))
 data Player = Player { playerPos :: Vec2 }
 
 instance LineRenderable Player where
-    lineSegments p = map (translateLine (playerPos p)) $ shipLines
+    lineSegments (Player {playerPos = p}) = map (translateLine p) $ shipLines
 
 -- | Constant for player ship size
 shipSize = 12.0 :: Float
