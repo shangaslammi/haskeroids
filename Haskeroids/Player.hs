@@ -9,7 +9,7 @@ data Player = Player { playerPos :: Vec2 }
 instance LineRenderable Player where
     lineSegments (Player {playerPos = p}) = map (translateLine p) $ shipLines
 
--- | Constant for player ship size
+-- | Constant for the ship size
 shipSize = 12.0 :: Float
 
 -- | List of lines that make up the ship hull
