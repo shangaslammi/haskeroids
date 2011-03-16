@@ -26,6 +26,9 @@ initializeOpenGL = do
     -- Nicer line and point drawing
     lineSmooth  $= Enabled
     pointSmooth $= Enabled
+    blend       $= Enabled
+    blendFunc   $= (SrcAlpha,OneMinusSrcAlpha)
+    lineWidth   $= 2.0
     
     -- Set up viewport
     viewport   $= (Position 0 0, Size 800 600)
