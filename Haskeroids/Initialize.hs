@@ -40,3 +40,4 @@ initializeOpenGL = do
 -- | Set up GLUT callbacks
 initializeCallbacks = do
     displayCallback $= renderViewport initialGameState
+    addTimerCallback 33 $ logicTick initialGameState
