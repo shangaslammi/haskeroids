@@ -27,4 +27,3 @@ lineVertices (LineSegment (p,p')) = do
 -- | Generate an OpenGL vertex from a point
 ptVertex :: Vec2 -> IO ()
 ptVertex = vertex . uncurry Vertex2
-
