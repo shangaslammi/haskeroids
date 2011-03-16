@@ -9,11 +9,11 @@ type Vec2 = (VecVal, VecVal)
 -- | Line segment between two points
 newtype LineSegment = LineSegment (Vec2, Vec2)
 
--- | Conversion from radial to cartesian coordinates
-radial :: VecVal -- ^ magnitude
-       -> VecVal -- ^ angle
-       -> Vec2   -- ^ cartesian point
-radial m a = (m * sin a, m * (-cos a))
+-- | Conversion from polar to cartesian coordinates
+polar :: VecVal -- ^ radial coordinate
+      -> VecVal -- ^ anglular coordinate
+      -> Vec2   -- ^ cartesian point
+polar m a = (m * sin a, m * (-cos a))
 
 -- | Transform a list of points into a list of connected line segments
 pointsToSegments :: [Vec2] -> [LineSegment]
