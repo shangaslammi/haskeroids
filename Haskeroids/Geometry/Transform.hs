@@ -11,10 +11,6 @@ data Body = Body {
     bodyAngle :: Float
     }
 
--- | Translate a body
-translate :: Vec2 -> Body -> Body
-translate v (Body p a) = Body (translatePt v p) a
-
 -- | Transform a line segment according to body position and orientation
 transform :: Body -> LineSegment -> LineSegment
 transform b = applyXform $ (translatePt $ bodyPos b) . (rotatePt $ bodyAngle b)
@@ -25,6 +21,7 @@ translatePt :: Vec2 -- ^ (x,y) delta
             -> Vec2 -- ^ translated point
 translatePt (x,y) (x',y') = (x+x', y+y')
 
+-- | Rotate a point around the origo
 rotatePt :: Float -> Vec2 -> Vec2
 rotatePt a (x,y) = (x', y')
     where x' = x * (cos a) - y * (sin a)
@@ -33,7 +30,3 @@ rotatePt a (x,y) = (x', y')
 -- | Apply a point transformation function to a line segment
 applyXform :: (Vec2 -> Vec2) -> LineSegment -> LineSegment
 applyXform f (LineSegment (p,p')) = (LineSegment (f p, f p'))
-
--- | Translate a line segment
-translateLine :: Vec2 -> LineSegment -> LineSegment
-translateLine = applyXform . translatePt
