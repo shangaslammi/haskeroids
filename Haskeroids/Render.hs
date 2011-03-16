@@ -2,7 +2,7 @@
 module Haskeroids.Render (LineRenderable(..)) where
 
 import Graphics.Rendering.OpenGL
-import Haskeroids.Util
+import Haskeroids.Geometry
 
 -- | Object that can be rendered as a group of lines
 class LineRenderable r where
@@ -18,8 +18,12 @@ renderLines lns = do
     currentColor $= Color4 0.9 0.9 0.9 1.0
     renderPrimitive Lines $ mapM_ lineVertices lns
 
--- | Generate the OpenGL vertices of a single line segment
+-- | Generate OpenGL vertex from a point
+ptVertex :: Vec2 -> IO ()
+ptVertex = vertex . uncurry Vertex2
+
+-- | Generate the OpenGL vertices of a line segment
 lineVertices :: LineSegment -> IO ()
-lineVertices (LineSegment ((x,y),(x',y'))) = do
-    vertex $ Vertex2 x y
-    vertex $ Vertex2 x' y'
+lineVertices (LineSegment (p,p')) = do
+    ptVertex p
+    ptVertex p'

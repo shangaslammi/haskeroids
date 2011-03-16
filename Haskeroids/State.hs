@@ -1,11 +1,10 @@
 module Haskeroids.State (
     GameState(..),
     initialGameState,
-    renderGameState
     ) where
 
 import Haskeroids.Player
-import Haskeroids.Util
+import Haskeroids.Geometry
 import Haskeroids.Render (LineRenderable(..))
 
 -- | Data type for tracking game state
@@ -20,10 +19,6 @@ initialGameState = GameState {
     statePlayer = initialPlayerState
     }
 
--- | Render the given game state
-renderGameState :: GameState -> IO ()
-renderGameState = render
-    
 -- | Initial state for the player ship at center of the screen
 initialPlayerState :: Player
 initialPlayerState = Player (400, 300)
