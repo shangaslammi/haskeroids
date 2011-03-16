@@ -21,13 +21,13 @@ pointsToSegments (p:p':[])     = [LineSegment (p,p')]
 pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
 
 -- | Translate a point
-ptTranslate :: Vec2 -- ^ (x,y) delta
-            -> Vec2 -- ^ original point
-            -> Vec2 -- ^ translated point
-ptTranslate (x,y) (x',y') = (x+x', y+y')
+translate :: Vec2 -- ^ (x,y) delta
+          -> Vec2 -- ^ original point
+          -> Vec2 -- ^ translated point
+translate (x,y) (x',y') = (x+x', y+y')
 
 -- | Translate a line segment
-lsTranslate :: Vec2 -> LineSegment -> LineSegment
-lsTranslate p (LineSegment (l,l')) = LineSegment (t l, t l')
-    where t = ptTranslate p
+translateLine :: Vec2 -> LineSegment -> LineSegment
+translateLine p (LineSegment (l,l')) = LineSegment (t l, t l')
+    where t = translate p
     
