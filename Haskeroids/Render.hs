@@ -18,12 +18,13 @@ renderLines lns = do
     currentColor $= Color4 0.9 0.9 0.9 1.0
     renderPrimitive Lines $ mapM_ lineVertices lns
 
--- | Generate OpenGL vertex from a point
-ptVertex :: Vec2 -> IO ()
-ptVertex = vertex . uncurry Vertex2
-
 -- | Generate the OpenGL vertices of a line segment
 lineVertices :: LineSegment -> IO ()
 lineVertices (LineSegment (p,p')) = do
     ptVertex p
     ptVertex p'
+
+-- | Generate OpenGL vertex from a point
+ptVertex :: Vec2 -> IO ()
+ptVertex = vertex . uncurry Vertex2
+
