@@ -34,4 +34,4 @@ stateLines = lineSegments . statePlayer
 
 -- | Tick state into a new game state
 tickState :: GameState -> GameState
-tickState (State pl) = GameState $ tick pl
+tickState (GameState pl) = GameState $ tick pl
