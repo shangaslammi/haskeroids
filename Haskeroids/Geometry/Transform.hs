@@ -13,7 +13,7 @@ data Body = Body {
 
 -- | Transform a line segment according to body position and orientation
 transform :: Body -> LineSegment -> LineSegment
-transform b = applyXform $ (translatePt $ bodyPos b) . (rotatePt $ bodyAngle b)
+transform (Body pos a) = applyXform $ (translatePt pos) . (rotatePt a)
 
 -- | Translate a point
 translatePt :: Vec2 -- ^ (x,y) delta
