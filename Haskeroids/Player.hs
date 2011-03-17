@@ -9,11 +9,10 @@ import Haskeroids.Tick
 data Player = Player { playerBody :: Body }
 
 instance LineRenderable Player where
-    lineSegments (Player {playerBody = b}) = map (transform b) $ shipLines
+    lineSegments (Player b) = map (transform b) $ shipLines
 
 instance Tickable Player where
-    tick (Player {playerBody = b@(Body {bodyAngle = a})}) = Player $ b {
-        bodyAngle = a + 0.1 }
+    tick (Player b) = Player $ rotate 0.1 b
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float

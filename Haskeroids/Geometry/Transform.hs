@@ -1,6 +1,7 @@
 module Haskeroids.Geometry.Transform (
     Body (..),
-    transform
+    transform,
+    rotate
     ) where
 
 import Haskeroids.Geometry
@@ -11,6 +12,10 @@ data Body = Body {
     bodyAngle :: Float
     }
 
+-- | Rotate a body
+rotate :: Float -> Body -> Body
+rotate d b@(Body {bodyAngle=a}) = b {bodyAngle = a+d}
+    
 -- | Transform a line segment according to body position and orientation
 transform :: Body -> LineSegment -> LineSegment
 transform (Body pos a) = applyXform $ (translatePt pos) . (rotatePt a)
