@@ -1,6 +1,6 @@
 module Haskeroids.Geometry.Transform (
     Body (..),
-    transform,
+    transform
     ) where
 
 import Haskeroids.Geometry
