@@ -7,6 +7,7 @@ import Haskeroids.Player
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Transform
 import Haskeroids.Render (LineRenderable(..))
+import Haskeroids.Tick
 
 -- | Data type for tracking game state
 data GameState = GameState { statePlayer :: Player }
@@ -14,6 +15,9 @@ data GameState = GameState { statePlayer :: Player }
 instance LineRenderable GameState where
     lineSegments = stateLines
 
+instance Tickable GameState where
+    tick = tickState
+    
 -- | Generate the initial game state
 initialGameState :: GameState
 initialGameState = GameState {
@@ -27,3 +31,7 @@ initialPlayerState = Player $ Body {bodyPos=(400, 300), bodyAngle=pi/4.0}
 -- | List of all renderable lines in the given state
 stateLines :: GameState -> [LineSegment]
 stateLines = lineSegments . statePlayer
+
+-- | Tick state into a new game state
+tickState :: GameState -> GameState
+tickState (GameState pl) = GameState $ tick pl
