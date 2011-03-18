@@ -14,7 +14,7 @@ instance LineRenderable Player where
 
 instance Tickable Player where
     tick kb (Player b) | isKeyDown kb KeyRight = Player $ rotate 0.2 b
-    tick kb (Player b) | isKeyDown kb KeyLeft  = Player $ rotate (-0.2) b
+                       | isKeyDown kb KeyLeft  = Player $ rotate (-0.2) b
     tick _ p = p
     
 -- | Constant for the ship size
