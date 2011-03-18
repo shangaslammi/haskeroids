@@ -1,4 +1,6 @@
 module Haskeroids.Tick where
 
+import Haskeroids.Keyboard (Keyboard)
+
 class Tickable t where
-    tick :: t -> t
+    tick :: Keyboard -> t -> t

@@ -2,7 +2,8 @@
     Keyboard,
     initKeyboard,
     handleKeyEvent,
-    isKeyDown) where
+    isKeyDown,
+    SpecialKey(..)) where
 
 import Data.Set (Set)
 import qualified Data.Set as Set

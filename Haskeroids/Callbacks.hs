@@ -1,4 +1,7 @@
-module Haskeroids.Callbacks (renderViewport, logicTick) where
+module Haskeroids.Callbacks (
+    renderViewport,
+    handleKeyboard,
+    logicTick) where
 
 import Data.IORef
 
@@ -18,11 +21,12 @@ renderViewport r = do
     swapBuffers
 
 -- | Periodical logic tick
-logicTick :: (LineRenderable t, Tickable t) => t -> IO ()
-logicTick t = do
-    let newTickable = tick t
+logicTick :: (LineRenderable t, Tickable t) => IORef Keyboard -> t -> IO ()
+logicTick kb t = do
+    keys <- readIORef kb
+    let newTickable = tick keys t
     displayCallback $= renderViewport newTickable
-    addTimerCallback 33 $ logicTick newTickable
+    addTimerCallback 33 $ logicTick kb newTickable
     postRedisplay Nothing
 
 -- | Update the Keyboard state according to the event

@@ -8,6 +8,7 @@ import Haskeroids.Geometry
 import Haskeroids.Geometry.Transform
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
+import Haskeroids.Keyboard (Keyboard)
 
 -- | Data type for tracking game state
 data GameState = GameState { statePlayer :: Player }
@@ -26,12 +27,12 @@ initialGameState = GameState {
 
 -- | Initial state for the player ship at center of the screen
 initialPlayerState :: Player
-initialPlayerState = Player $ Body {bodyPos=(400, 300), bodyAngle=pi/4.0}
+initialPlayerState = Player $ Body {bodyPos=(400, 300), bodyAngle=0}
 
 -- | List of all renderable lines in the given state
 stateLines :: GameState -> [LineSegment]
 stateLines = lineSegments . statePlayer
 
 -- | Tick state into a new game state
-tickState :: GameState -> GameState
-tickState (GameState pl) = GameState $ tick pl
+tickState :: Keyboard -> GameState -> GameState
+tickState kb (GameState pl) = GameState $ tick kb pl

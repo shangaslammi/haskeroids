@@ -4,6 +4,7 @@ import Haskeroids.Geometry
 import Haskeroids.Geometry.Transform
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
+import Haskeroids.Keyboard (isKeyDown, SpecialKey(..))
 
 -- | Data type for tracking current player state
 data Player = Player { playerBody :: Body }
@@ -12,7 +13,9 @@ instance LineRenderable Player where
     lineSegments (Player b) = map (transform b) $ shipLines
 
 instance Tickable Player where
-    tick (Player b) = Player $ rotate 0.1 b
+    tick kb (Player b) | isKeyDown kb KeyRight = Player $ rotate 0.2 b
+    tick kb (Player b) | isKeyDown kb KeyLeft  = Player $ rotate (-0.2) b
+    tick _ p = p
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float
