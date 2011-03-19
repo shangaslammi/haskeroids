@@ -27,7 +27,7 @@ initialGameState = GameState {
 
 -- | Initial state for the player ship at center of the screen
 initialPlayerState :: Player
-initialPlayerState = Player $ Body {bodyPos=(400, 300), bodyAngle=0}
+initialPlayerState = Player $ initBody (400,300)
 
 -- | List of all renderable lines in the given state
 stateLines :: GameState -> [LineSegment]

@@ -14,9 +14,19 @@ instance LineRenderable Player where
     lineSegments (Player b) = map (transform b) $ shipLines
 
 instance Tickable Player where
-    tick kb (Player b) | isKeyDown kb turnRight = Player $ rotate 0.2 b
-                       | isKeyDown kb turnLeft  = Player $ rotate (-0.2) b
-    tick _ p = p
+    tick kb (Player b) = Player $ updatePlayerBody turn acc b
+        where turn | key turnLeft  = -0.2
+                   | key turnRight = 0.2
+                   | otherwise     = 0
+              
+              acc | key thrust = 1.5
+                  | otherwise  = 0
+                  
+              key = isKeyDown kb
+
+-- | Update the player ship with the given turn rate and acceleration
+updatePlayerBody :: Float -> Float -> Body -> Body
+updatePlayerBody turn acc = damping 0.96 . updateBody . rotate turn . accForward acc
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float

@@ -1,7 +1,11 @@
 module Haskeroids.Geometry.Transform (
     Body (..),
     transform,
-    rotate
+    rotate,
+    damping,
+    accForward,
+    updateBody,
+    initBody,
     ) where
 
 import Haskeroids.Geometry
@@ -25,6 +29,10 @@ accelerate (ax,ay) b = b { bodyVelocity = newVelocity }
     where newVelocity = (ax+vx, ay+vy)
           (vx,vy)     = bodyVelocity b
 
+-- | Accelerate a rigid body according to its current angle
+accForward :: Float -> Body -> Body
+accForward m b = accelerate (polar m (bodyAngle b)) b
+          
 -- | Update the position and orientation of a body according to its current
 --   velocity and rotation.
 updateBody :: Body -> Body
