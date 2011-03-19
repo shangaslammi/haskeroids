@@ -6,9 +6,6 @@ module Haskeroids.Callbacks (
 import Data.IORef
 import Data.Time.Clock.POSIX
 
-import Control.Monad (when)
-import Control.Concurrent (threadDelay)
-
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
