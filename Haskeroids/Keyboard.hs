@@ -8,7 +8,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Graphics.UI.GLUT (Key(..), KeyState(..))
 
--- | Set of all special keys that are currently held down
+-- | Set of all keys that are currently held down
 newtype Keyboard = Keyboard (Set Key)
 
 -- | Create a new Keyboard
