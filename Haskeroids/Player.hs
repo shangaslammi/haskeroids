@@ -26,7 +26,7 @@ instance Tickable Player where
 
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body
-updatePlayerBody turn acc = damping 0.96 . updateBody . accForward acc . rotate turn
+updatePlayerBody turn acc = updateBody . damping 0.96 . accForward acc . rotate turn
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float
