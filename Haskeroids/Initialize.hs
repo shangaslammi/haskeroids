@@ -45,4 +45,4 @@ initializeCallbacks = do
     kb <- newIORef initKeyboard
     keyboardMouseCallback $= Just (handleKeyboard kb)
     displayCallback $= renderViewport initialGameState
-    addTimerCallback 0 $ logicTick initialGameState
+    addTimerCallback 0 $ logicTick kb initialGameState
