@@ -1,8 +1,5 @@
 module Haskeroids.Initialize where
 
-import Data.IORef
-import Data.Time.Clock.POSIX
-
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
@@ -43,8 +40,8 @@ initializeOpenGL = do
 
 -- | Set up GLUT callbacks
 initializeCallbacks = do
-    kb <- newIORef initKeyboard
-    tr <- getPOSIXTime >>= newIORef
-    keyboardMouseCallback $= Just (handleKeyboard kb)
-    displayCallback $= renderViewport initialGameState
-    addTimerCallback 0 $ logicTick tr kb initialGameState
+    refs <- initCallbackRefs
+    
+    keyboardMouseCallback $= Just (handleKeyboard refs)
+    displayCallback $= renderViewport refs
+    --addTimerCallback 0 $ logicTick refs

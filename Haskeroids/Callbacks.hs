@@ -1,9 +1,10 @@
 module Haskeroids.Callbacks (
+    initCallbackRefs,
     renderViewport,
-    handleKeyboard,
-    logicTick) where
+    handleKeyboard) where
 
 import Data.IORef
+import Data.Time.Clock (secondsToDiffTime)
 import Data.Time.Clock.POSIX
 
 import Graphics.Rendering.OpenGL
@@ -12,36 +13,55 @@ import Graphics.UI.GLUT
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard
+import Haskeroids.State (GameState, initialGameState)
 
 type KeyboardRef = IORef Keyboard
-type TimeRef = IORef POSIXTime
+type TimeRef     = IORef POSIXTime
+type StateRef    = IORef GameState
+
+data CallbackRefs = CallbackRefs TimeRef TimeRef KeyboardRef StateRef
+
+-- | Initialize a new group of callback references
+initCallbackRefs :: IO CallbackRefs
+initCallbackRefs = do
+    accum <- newIORef $ 0
+    prev  <- getPOSIXTime >>= newIORef
+    keyb  <- newIORef initKeyboard
+    st    <- newIORef initialGameState
+    return $ CallbackRefs accum prev keyb st
 
 -- | Render the viewport using the given renderable and swap buffers
-renderViewport :: LineRenderable r => r -> IO ()
-renderViewport r = do
-    clear [ColorBuffer]
-    render r
-    swapBuffers
-
--- | Periodical logic tick
-logicTick :: (LineRenderable t, Tickable t) => TimeRef -> KeyboardRef -> t -> IO ()
-logicTick tr kb t = do
-    prev <- readIORef tr
+renderViewport :: CallbackRefs -> IO ()
+renderViewport refs@(CallbackRefs ar tr kb rr) = do
     current <- getPOSIXTime
+    prev <- readIORef tr
+    accum <- readIORef ar
+    keys <- readIORef kb
     
-    let delta = current - prev
-    if (delta > 0.033) then do
-        writeIORef tr current
-        
-        keys <- readIORef kb
-        
-        let newTickable = tick keys t
-        displayCallback $= renderViewport newTickable
-        addTimerCallback 0 $ logicTick tr kb newTickable
-        postRedisplay Nothing
-        
-    else addTimerCallback 0 $ logicTick tr kb t
+    let frameTime = min 0.1 $ current - prev
+        newAccum  = accum + frameTime
+
+    let consumeAccum acc = if acc >= 0.033
+            then do
+               modifyIORef rr $ tick keys
+               consumeAccum $ acc - 0.033
+            else return acc
+    
+    newAccum' <- consumeAccum newAccum
+    
+    writeIORef tr current
+    writeIORef ar newAccum'
+    
+    let interpolation = realToFrac $ newAccum' / 0.033
+    
+    r <- readIORef rr
+    
+    clear [ColorBuffer]
+    renderInterpolated interpolation r
+    swapBuffers
+    postRedisplay Nothing
+   
 
 -- | Update the Keyboard state according to the event
-handleKeyboard :: KeyboardRef -> KeyboardMouseCallback
-handleKeyboard kb k ks _ _ = modifyIORef kb (handleKeyEvent k ks)
+handleKeyboard :: CallbackRefs -> KeyboardMouseCallback
+handleKeyboard (CallbackRefs _ _ kb _) k ks _ _ = modifyIORef kb (handleKeyEvent k ks)

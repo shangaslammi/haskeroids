@@ -23,6 +23,11 @@ pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
 -- | Add two vectors
 (x,y) /+/ (x',y') = (x+x', y+y')
 
+infixl 6 /+/
+
 -- | Multiply a vector with a scalar
 s */ (x,y) = (s*x, s*y)
 (x,y) /* s = (s*x, s*y)
+
+infixl 7 /*
+infixl 7 */

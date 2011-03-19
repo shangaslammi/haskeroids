@@ -15,6 +15,8 @@ data GameState = GameState { statePlayer :: Player }
 
 instance LineRenderable GameState where
     lineSegments = stateLines
+    
+    interpolatedLines f = interpolatedLines f . statePlayer
 
 instance Tickable GameState where
     tick = tickState

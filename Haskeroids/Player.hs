@@ -12,6 +12,9 @@ data Player = Player { playerBody :: Body }
 
 instance LineRenderable Player where
     lineSegments (Player b) = map (transform b) $ shipLines
+    
+    interpolatedLines f (Player b) = map (transform b') $ shipLines
+        where b' = interpolatedBody f b
 
 instance Tickable Player where
     tick kb (Player b) = Player $ updatePlayerBody turn acc b
