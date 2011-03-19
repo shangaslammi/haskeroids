@@ -24,4 +24,5 @@ pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
 (x,y) /+/ (x',y') = (x+x', y+y')
 
 -- | Multiply a vector with a scalar
-s /*/ (x,y) = (s*x, s*y)
+s */ (x,y) = (s*x, s*y)
+(x,y) /* s = (s*x, s*y)
