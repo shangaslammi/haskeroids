@@ -18,11 +18,11 @@ instance LineRenderable Player where
 
 instance Tickable Player where
     tick kb (Player b) = Player $ updatePlayerBody turn acc b
-        where turn | key turnLeft  = -0.2
-                   | key turnRight = 0.2
+        where turn | key turnLeft  = -0.12
+                   | key turnRight = 0.12
                    | otherwise     = 0
               
-              acc | key thrust = 1.5
+              acc | key thrust = 0.5
                   | otherwise  = 0
                   
               key = isKeyDown kb

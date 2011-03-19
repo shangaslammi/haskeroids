@@ -3,9 +3,7 @@ module Haskeroids.Initialize where
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
-import Haskeroids.State (initialGameState)
 import Haskeroids.Callbacks
-import Haskeroids.Keyboard (initKeyboard)
 
 -- | Set up the main application window
 initializeWindow = do
@@ -44,4 +42,3 @@ initializeCallbacks = do
     
     keyboardMouseCallback $= Just (handleKeyboard refs)
     displayCallback $= renderViewport refs
-    --addTimerCallback 0 $ logicTick refs

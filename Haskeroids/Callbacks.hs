@@ -41,10 +41,10 @@ renderViewport refs@(CallbackRefs ar tr kb rr) = do
     let frameTime = min 0.1 $ current - prev
         newAccum  = accum + frameTime
 
-    let consumeAccum acc = if acc >= 0.033
+    let consumeAccum acc = if acc >= 0.025
             then do
                modifyIORef rr $ tick keys
-               consumeAccum $ acc - 0.033
+               consumeAccum $ acc - 0.025
             else return acc
     
     newAccum' <- consumeAccum newAccum
@@ -52,7 +52,7 @@ renderViewport refs@(CallbackRefs ar tr kb rr) = do
     writeIORef tr current
     writeIORef ar newAccum'
     
-    let interpolation = realToFrac $ newAccum' / 0.033
+    let interpolation = realToFrac $ newAccum' / 0.025
     
     r <- readIORef rr
     
@@ -60,7 +60,6 @@ renderViewport refs@(CallbackRefs ar tr kb rr) = do
     renderInterpolated interpolation r
     swapBuffers
     postRedisplay Nothing
-   
 
 -- | Update the Keyboard state according to the event
 handleKeyboard :: CallbackRefs -> KeyboardMouseCallback
