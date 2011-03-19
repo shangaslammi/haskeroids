@@ -12,6 +12,7 @@ import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard
 
+type KeyboardRef = IORef Keyboard
 
 -- | Render the viewport using the given renderable and swap buffers
 renderViewport :: LineRenderable r => r -> IO ()
@@ -21,7 +22,7 @@ renderViewport r = do
     swapBuffers
 
 -- | Periodical logic tick
-logicTick :: (LineRenderable t, Tickable t) => IORef Keyboard -> t -> IO ()
+logicTick :: (LineRenderable t, Tickable t) => KeyboardRef -> t -> IO ()
 logicTick kb t = do
     keys <- readIORef kb
     let newTickable = tick keys t
@@ -30,5 +31,5 @@ logicTick kb t = do
     postRedisplay Nothing
 
 -- | Update the Keyboard state according to the event
-handleKeyboard :: IORef Keyboard -> Key -> KeyState -> Modifiers -> Position -> IO ()
+handleKeyboard :: KeyboardRef -> KeyboardMouseCallback
 handleKeyboard kb k ks _ _ = modifyIORef kb (handleKeyEvent k ks)
