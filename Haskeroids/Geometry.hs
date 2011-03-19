@@ -19,3 +19,9 @@ polar m a = (m * sin a, m * (-cos a))
 pointsToSegments :: [Vec2] -> [LineSegment]
 pointsToSegments (p:p':[])     = [LineSegment (p,p')]
 pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
+
+-- | Add two vectors
+(x,y) /+/ (x',y') = (x+x', y+y')
+
+-- | Multiply a vector with a scalar
+s /*/ (x,y) = (s*x, s*y)
