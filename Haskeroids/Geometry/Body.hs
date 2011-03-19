@@ -1,5 +1,6 @@
 ﻿module Haskeroids.Geometry.Body (
     Body (..),
+    HasBody (..),
     transform,
     rotate,
     damping,
@@ -23,6 +24,14 @@ data Body = Body {
     prevPos   :: Vec2,
     prevAngle :: Float
     }
+    
+-- | Type class for objects that have a body
+class HasBody b where
+    getBody :: b -> Body
+    setBody :: Body -> b -> b
+    
+    updateWith :: (Body -> Body) -> b -> b
+    updateWith f b = setBody (f (getBody b)) b
 
 -- | Initialize a new rigid body in the given location
 initBody :: Vec2 -> Body

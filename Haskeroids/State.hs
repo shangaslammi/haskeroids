@@ -4,6 +4,7 @@ module Haskeroids.State (
     ) where
 
 import Haskeroids.Player
+import Haskeroids.Asteroid
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body (initBody)
 import Haskeroids.Render (LineRenderable(..))
@@ -11,7 +12,10 @@ import Haskeroids.Tick
 import Haskeroids.Keyboard (Keyboard)
 
 -- | Data type for tracking game state
-data GameState = GameState { statePlayer :: Player }
+data GameState = GameState {
+    statePlayer    :: Player,
+    stateAsteroids :: [Asteroid]
+    }
 
 instance LineRenderable GameState where
     lineSegments = stateLines
@@ -24,7 +28,8 @@ instance Tickable GameState where
 -- | Generate the initial game state
 initialGameState :: GameState
 initialGameState = GameState {
-    statePlayer = initialPlayerState
+    statePlayer    = initialPlayerState,
+    stateAsteroids = []
     }
 
 -- | Initial state for the player ship at center of the screen
@@ -37,4 +42,7 @@ stateLines = lineSegments . statePlayer
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
-tickState kb (GameState pl) = GameState $ tick kb pl
+tickState kb s@(GameState pl a) = s {
+    statePlayer    = tick kb pl,
+    stateAsteroids = map updateAsteroid a
+    }
