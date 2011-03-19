@@ -37,6 +37,7 @@ updateBody b = b { bodyPos = pos', bodyAngle = a', prevPos = pos, prevAngle = a 
           pos' = pos /+/ bodyVelocity b
           a'   = a + bodyRotation b
 
+-- | Generate body data is is between current and previous state.
 interpolatedBody :: Float -- ^ interpolation point
                  -> Body  -- ^ body
                  -> Body  -- ^ interpolated body
@@ -44,7 +45,6 @@ interpolatedBody i b = b { bodyPos = pos', bodyAngle = a' }
     where pos' = (bodyPos b) /* i /+/ (prevPos b) /* i'
           a'   = (bodyAngle b) * i + (prevAngle b) * i'
           i'   = 1.0 - i
-
           
 -- | Accelerate a rigid body with the given vector
 accelerate :: Vec2 -> Body -> Body

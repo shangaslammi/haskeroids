@@ -24,7 +24,7 @@ data CallbackRefs = CallbackRefs TimeRef TimeRef KeyboardRef StateRef
 -- | Initialize a new group of callback references
 initCallbackRefs :: IO CallbackRefs
 initCallbackRefs = do
-    accum <- newIORef $ 0
+    accum <- newIORef $ 0.0333
     prev  <- getPOSIXTime >>= newIORef
     keyb  <- newIORef initKeyboard
     st    <- newIORef initialGameState
@@ -41,10 +41,10 @@ renderViewport refs@(CallbackRefs ar tr kb rr) = do
     let frameTime = min 0.1 $ current - prev
         newAccum  = accum + frameTime
 
-    let consumeAccum acc = if acc >= 0.025
+    let consumeAccum acc = if acc >= 0.0333
             then do
                modifyIORef rr $ tick keys
-               consumeAccum $ acc - 0.025
+               consumeAccum $ acc - 0.0333
             else return acc
     
     newAccum' <- consumeAccum newAccum
@@ -52,7 +52,7 @@ renderViewport refs@(CallbackRefs ar tr kb rr) = do
     writeIORef tr current
     writeIORef ar newAccum'
     
-    let interpolation = realToFrac $ newAccum' / 0.025
+    let interpolation = realToFrac $ newAccum' / 0.0333
     
     r <- readIORef rr
     
