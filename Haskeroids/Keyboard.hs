@@ -2,27 +2,25 @@
     Keyboard,
     initKeyboard,
     handleKeyEvent,
-    isKeyDown,
-    SpecialKey(..)) where
+    isKeyDown) where
 
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Graphics.UI.GLUT
+import Graphics.UI.GLUT (Key(..), KeyState(..))
 
 -- | Set of all special keys that are currently held down
-newtype Keyboard = Keyboard (Set SpecialKey)
+newtype Keyboard = Keyboard (Set Key)
 
--- | Create a new Keyboard manager
+-- | Create a new Keyboard
 initKeyboard :: Keyboard
 initKeyboard = Keyboard Set.empty
 
--- | Record a key state change in the given Keyboard manager
+-- | Record a key state change in the given Keyboard
 handleKeyEvent :: Key -> KeyState -> Keyboard -> Keyboard
-handleKeyEvent (SpecialKey k) ks (Keyboard s) = case ks of
+handleKeyEvent k ks (Keyboard s) = case ks of
     Up   -> Keyboard $ Set.delete k s
     Down -> Keyboard $ Set.insert k s
-handleKeyEvent _ _ kb = kb
 
 -- | Test if a key is currently held down in the given Keyboard
-isKeyDown :: Keyboard -> SpecialKey -> Bool
+isKeyDown :: Keyboard -> Key -> Bool
 isKeyDown (Keyboard s) k = Set.member k s
