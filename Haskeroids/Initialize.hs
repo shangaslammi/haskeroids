@@ -47,4 +47,4 @@ initializeCallbacks = do
     tr <- getPOSIXTime >>= newIORef
     keyboardMouseCallback $= Just (handleKeyboard kb)
     displayCallback $= renderViewport initialGameState
-    addTimerCallback 0 (logicTick tr kb initialGameState)
+    addTimerCallback 0 $ logicTick tr kb initialGameState
