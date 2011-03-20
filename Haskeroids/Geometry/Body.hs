@@ -1,6 +1,5 @@
 ﻿module Haskeroids.Geometry.Body (
     Body (..),
-    HasBody (..),
     transform,
     rotate,
     damping,
