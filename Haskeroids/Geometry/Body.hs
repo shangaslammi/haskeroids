@@ -23,7 +23,7 @@ data Body = Body {
     prevPos   :: Vec2,
     prevAngle :: Float
     }
-    
+
 -- | Initialize a new rigid body in the given location
 initBody :: Vec2 -> Body
 initBody pos = Body pos 0 (0,0) 0 pos 0
