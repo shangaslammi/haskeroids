@@ -1,6 +1,7 @@
 ﻿module Haskeroids.Geometry.Body (
     Body (..),
     transform,
+    transformPt,
     rotate,
     damping,
     accForward,
@@ -71,4 +72,7 @@ rotate nr b = b {bodyRotation = nr}
     
 -- | Transform a line segment according to body position and orientation
 transform :: Body -> LineSegment -> LineSegment
-transform (Body pos a _ _ _ _) = applyXform $ (translatePt pos) . (rotatePt a)
+transform b = applyXform $ transformPt b
+
+transformPt :: Body -> Vec2 -> Vec2
+transformPt (Body pos a _ _ _ _) =(translatePt pos) . (rotatePt a)

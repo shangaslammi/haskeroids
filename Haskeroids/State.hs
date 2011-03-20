@@ -36,6 +36,8 @@ initialGameState = GameState {
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
 tickState kb s@(GameState pl a) = s {
-    statePlayer    = tick kb pl,
-    stateAsteroids = map updateAsteroid a
+    statePlayer    = collidePA p' a',
+    stateAsteroids = a'
     }
+    where  p' = tick kb pl
+           a' = map updateAsteroid a

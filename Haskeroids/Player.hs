@@ -1,4 +1,4 @@
-module Haskeroids.Player (Player(..), initPlayer) where
+module Haskeroids.Player (Player(..), initPlayer, collidePA) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
@@ -6,6 +6,7 @@ import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard (isKeyDown)
 import Haskeroids.Controls
+import Haskeroids.Asteroid
 
 -- | Data type for tracking current player state
 data Player = Player {
@@ -29,6 +30,14 @@ instance Tickable Player where
                   | otherwise  = 0
                   
               key = isKeyDown kb
+              
+collidePA :: Player -> [Asteroid] -> Player
+collidePA p@(Player _ False) _ = p
+collidePA p [] = p
+collidePA p (x:xs) = collidePA (collided) xs
+    where collided = p { playerAlive = not $ any (collidePtA x) points }
+          points   = map (transformPt b) shipPoints
+          b        = playerBody p
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
@@ -43,9 +52,11 @@ shipSize = 12.0 :: Float
 
 -- | List of lines that make up the ship hull
 shipLines :: [LineSegment]
-shipLines = pointsToSegments points
-    where points = [polar shipSize      0,
-                    polar shipSize      (0.7*pi),
-                    polar (shipSize*0.2) pi,
-                    polar shipSize      (1.3*pi),
-                    polar shipSize      0]
+shipLines = pointsToSegments shipPoints
+
+shipPoints :: [Vec2]
+shipPoints = [polar shipSize      0,
+              polar shipSize      (0.7*pi),
+              polar (shipSize*0.2) pi,
+              polar shipSize      (1.3*pi),
+              polar shipSize      0]

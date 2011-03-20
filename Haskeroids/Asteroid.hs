@@ -1,7 +1,8 @@
 ﻿module Haskeroids.Asteroid (
     Asteroid,
     newAsteroid,
-    updateAsteroid
+    updateAsteroid,
+    collidePtA,
     ) where
 
 import Haskeroids.Geometry
@@ -22,6 +23,14 @@ newAsteroid pos v r = Asteroid Large $ Body pos 0 v r pos 0
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
 updateAsteroid (Asteroid sz b) = Asteroid sz $ updateBody b
+
+collidePtA :: Asteroid -> Vec2 -> Bool
+collidePtA (Asteroid sz b) (x,y) = distSqr < (r*r)
+    where distSqr = dx*dx + dy*dy
+          r = radius sz
+          dx = x-ax
+          dy = y-ay
+          (ax,ay) = bodyPos b
 
 -- | Get the radius for an asteroid size
 radius :: Size -> Float
