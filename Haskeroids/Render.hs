@@ -6,12 +6,7 @@ import Haskeroids.Geometry
 
 -- | Object that can be rendered as a group of lines
 class LineRenderable r where
-    lineSegments :: r -> [LineSegment]
-
     interpolatedLines :: Float -> r -> [LineSegment]
-    
-    render :: r -> IO ()
-    render = renderLines . lineSegments
     
     renderInterpolated :: Float -> r -> IO()
     renderInterpolated f = renderLines . interpolatedLines f
