@@ -31,11 +31,16 @@ initBody pos = Body pos 0 (0,0) 0 pos 0
 -- | Update the position and orientation of a body according to its current
 --   velocity and rotation.
 updateBody :: Body -> Body
-updateBody b = b { bodyPos = pos', bodyAngle = a', prevPos = pos, prevAngle = a }
-    where a    = bodyAngle b
-          pos  = bodyPos b
-          pos' = pos /+/ bodyVelocity b
-          a'   = a + bodyRotation b
+updateBody b = b { 
+    bodyPos = pos' /+/ wraparound, bodyAngle = a',
+    prevPos = pos /+/ wraparound, prevAngle = a }
+    
+    where a     = bodyAngle b
+          pos   = bodyPos b
+          pos'  = pos /+/ bodyVelocity b
+          a'    = a + bodyRotation b
+          (nx,ny) = pos'
+          wraparound = wrapper pos'
 
 -- | Generate body data is is between current and previous state.
 interpolatedBody :: Float -- ^ interpolation point
