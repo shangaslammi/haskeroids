@@ -22,7 +22,6 @@ pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
 
 -- | Give a delta vector that needs to be added to point to wrap it around the
 --   screen edge.
-
 wrapper :: Vec2 -> Vec2
 wrapper (x,y) = (x',y')
     where x' | x < 0 = 800

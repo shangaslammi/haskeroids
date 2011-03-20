@@ -12,7 +12,6 @@ class LineRenderable r where
     renderInterpolated :: Float -> r -> IO()
     renderInterpolated f = renderLines . interpolatedLines f
 
-
 -- | Render a list of line segments using OpenGL
 renderLines :: [LineSegment] -> IO ()
 renderLines lns = do
@@ -28,7 +27,7 @@ wrapLines = foldr go []
                 | second    = l:l'':acc
                 | otherwise = l:acc
             where
-              both   = first && second
+              both   = first && second && first /= second
               first  = (w /= (0,0))
               second = (w' /= (0,0))
               
@@ -37,7 +36,6 @@ wrapLines = foldr go []
               l'  = applyXform (translatePt w) l
               l'' = applyXform (translatePt w') l
 
-    
 -- | Generate the OpenGL vertices of a line segment
 lineVertices :: LineSegment -> IO ()
 lineVertices (LineSegment (p,p')) = do
