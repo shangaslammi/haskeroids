@@ -18,7 +18,9 @@ data GameState = GameState {
     }
 
 instance LineRenderable GameState where
-    interpolatedLines f = interpolatedLines f . statePlayer
+    interpolatedLines f (GameState p a) = plines ++ alines
+        where plines = interpolatedLines f p
+              alines = concatMap (interpolatedLines f) a
 
 instance Tickable GameState where
     tick = tickState
@@ -27,7 +29,7 @@ instance Tickable GameState where
 initialGameState :: GameState
 initialGameState = GameState {
     statePlayer    = initialPlayerState,
-    stateAsteroids = []
+    stateAsteroids = [newAsteroid (20,50) (1.5,0.7) (-0.02)]
     }
 
 -- | Initial state for the player ship at center of the screen
