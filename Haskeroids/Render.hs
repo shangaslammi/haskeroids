@@ -22,12 +22,12 @@ renderLines lns = do
 wrapLines :: [LineSegment] -> [LineSegment]
 wrapLines = foldr go []
     where go l@(LineSegment (p,p')) acc
-                | both      = l:l':l'':acc
+                | both      = l':l'':acc
                 | first     = l:l':acc
                 | second    = l:l'':acc
                 | otherwise = l:acc
             where
-              both   = first && second && first /= second
+              both   = first && second && w/= w'
               first  = (w /= (0,0))
               second = (w' /= (0,0))
               
