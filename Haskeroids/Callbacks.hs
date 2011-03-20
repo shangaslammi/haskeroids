@@ -4,7 +4,6 @@ module Haskeroids.Callbacks (
     handleKeyboard) where
 
 import Data.IORef
-import Data.Time.Clock (secondsToDiffTime)
 import Data.Time.Clock.POSIX
 
 import Graphics.Rendering.OpenGL
@@ -30,7 +29,7 @@ initCallbackRefs = do
     st    <- newIORef initialGameState
     return $ CallbackRefs accum prev keyb st
 
--- | Render the viewport using the given renderable and swap buffers
+-- | Run the game logic, render the view and swap display buffers
 renderViewport :: CallbackRefs -> IO ()
 renderViewport refs@(CallbackRefs ar tr kb rr) = do
     current <- getPOSIXTime
