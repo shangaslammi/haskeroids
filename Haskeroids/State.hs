@@ -18,8 +18,6 @@ data GameState = GameState {
     }
 
 instance LineRenderable GameState where
-    lineSegments = stateLines
-    
     interpolatedLines f = interpolatedLines f . statePlayer
 
 instance Tickable GameState where
@@ -35,10 +33,6 @@ initialGameState = GameState {
 -- | Initial state for the player ship at center of the screen
 initialPlayerState :: Player
 initialPlayerState = Player $ initBody (400,300)
-
--- | List of all renderable lines in the given state
-stateLines :: GameState -> [LineSegment]
-stateLines = lineSegments . statePlayer
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
