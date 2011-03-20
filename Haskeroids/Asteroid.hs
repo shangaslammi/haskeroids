@@ -39,4 +39,4 @@ numVertices Large  = 12
 asteroidLines sz = pointsToSegments $ pts sz
     where pts sz  = polarPoints (numVertices sz) (radius sz)
           polarPoints s r = map (polar r) [0.0,step..2.0*pi]
-             where step = 2.0*pi/s
+             where step = 2.0*pi/(fromIntegral s)

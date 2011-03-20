@@ -29,7 +29,9 @@ instance Tickable GameState where
 initialGameState :: GameState
 initialGameState = GameState {
     statePlayer    = initialPlayerState,
-    stateAsteroids = [newAsteroid (20,50) (1.5,0.7) (-0.02)]
+    stateAsteroids = [
+        newAsteroid (20,50) (1.5,0.7) (-0.02),
+        newAsteroid (700, 10) (-1, 0.4) (-0.015)]
     }
 
 -- | Initial state for the player ship at center of the screen
