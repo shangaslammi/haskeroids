@@ -1,4 +1,4 @@
-module Haskeroids.Player (Player(..)) where
+module Haskeroids.Player (Player(..), initPlayer) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
@@ -8,14 +8,19 @@ import Haskeroids.Keyboard (isKeyDown)
 import Haskeroids.Controls
 
 -- | Data type for tracking current player state
-data Player = Player { playerBody :: Body }
+data Player = Player {
+    playerBody  :: Body,
+    playerAlive :: Bool
+    }
 
 instance LineRenderable Player where
-    interpolatedLines f (Player b) = map (transform b') $ shipLines
+    interpolatedLines _ (Player _ False) = []
+    interpolatedLines f (Player b _) = map (transform b') $ shipLines
         where b' = interpolatedBody f b
 
 instance Tickable Player where
-    tick kb (Player b) = Player $ updatePlayerBody turn acc b
+    tick _  p@(Player _ False) = p
+    tick kb p@(Player b _) = p { playerBody  = updatePlayerBody turn acc b }
         where turn | key turnLeft  = -0.18
                    | key turnRight = 0.18
                    | otherwise     = 0
@@ -24,6 +29,10 @@ instance Tickable Player where
                   | otherwise  = 0
                   
               key = isKeyDown kb
+
+-- | Initial state for the player ship at center of the screen
+initPlayer :: Player
+initPlayer = Player (initBody (400,300)) True
 
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body
