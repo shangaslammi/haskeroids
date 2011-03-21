@@ -7,6 +7,7 @@ import Haskeroids.Tick
 import Haskeroids.Keyboard (isKeyDown)
 import Haskeroids.Controls
 import Haskeroids.Asteroid
+import Haskeroids.Collision
 
 -- | Data type for tracking current player state
 data Player = Player {
