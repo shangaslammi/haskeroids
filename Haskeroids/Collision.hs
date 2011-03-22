@@ -7,9 +7,16 @@ import Haskeroids.Geometry
 class Collider c where
     collisionLines :: c -> [LineSegment]
     
+    collisionCenter :: c -> Vec2
+    collisionRadius :: c -> Float
+    
     collides :: (Collider d) => c -> d -> Bool
-    collides c c' = or $ lineCollision <$> cl <*> cl'
-        where cl  = collisionLines c
+    collides c c' = canCollide && doesCollide
+        where canCollide  = distSqr < radius*radius
+              doesCollide = or $ lineCollision <$> cl <*> cl'
+              distSqr = ptDistanceSqr (collisionCenter c) (collisionCenter c')
+              radius  = (collisionRadius c) + (collisionRadius c')
+              cl  = collisionLines c
               cl' = collisionLines c'
 
 lineCollision :: LineSegment -> LineSegment -> Bool

@@ -8,6 +8,7 @@
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 import Haskeroids.Render
+import Haskeroids.Collision
 
 data Size = Small|Medium|Large deriving (Ord, Eq)
 data Asteroid = Asteroid Size Body
@@ -15,6 +16,11 @@ data Asteroid = Asteroid Size Body
 instance LineRenderable Asteroid where
     interpolatedLines f (Asteroid sz b) = map (transform b') $ asteroidLines sz
         where b' = interpolatedBody f b
+
+instance Collider Asteroid where
+    collisionCenter (Asteroid _ b)  = bodyPos b
+    collisionRadius (Asteroid sz _) = radius sz
+    collisionLines = interpolatedLines 0
 
 -- | Initialize a new asteroid with the given position, velocity and rotation        
 newAsteroid :: Vec2 -> Vec2 -> Float -> Asteroid

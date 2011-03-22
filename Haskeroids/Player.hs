@@ -32,6 +32,11 @@ instance Tickable Player where
                   
               key = isKeyDown kb
               
+instance Collider Player where
+    collisionCenter = bodyPos . playerBody
+    collisionRadius = const shipSize
+    collisionLines  = interpolatedLines 0
+
 collidePA :: Player -> [Asteroid] -> Player
 collidePA p@(Player _ False) _ = p
 collidePA p [] = p

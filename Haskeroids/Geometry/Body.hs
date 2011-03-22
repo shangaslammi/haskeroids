@@ -46,6 +46,7 @@ updateBody b = b {
 interpolatedBody :: Float -- ^ interpolation point
                  -> Body  -- ^ body
                  -> Body  -- ^ interpolated body
+
 interpolatedBody i b = b { bodyPos = pos', bodyAngle = a' }
     where pos' = (bodyPos b) /* i /+/ (prevPos b) /* i'
           a'   = (bodyAngle b) * i + (prevAngle b) * i'

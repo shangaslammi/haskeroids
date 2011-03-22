@@ -31,6 +31,12 @@ wrapper (x,y) = (x',y')
              | y >= 600 = -600
              | otherwise = 0
 
+             
+ptDistanceSqr :: Vec2 -> Vec2 -> VecVal
+ptDistanceSqr (x,y) (x',y') = dx*dx + dy*dy
+    where dx = x-x'
+          dy = y-y'
+
 -- | Add two vectors
 (x,y) /+/ (x',y') = (x+x', y+y')
 
