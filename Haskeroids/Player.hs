@@ -40,10 +40,7 @@ instance Collider Player where
 collidePA :: Player -> [Asteroid] -> Player
 collidePA p@(Player _ False) _ = p
 collidePA p [] = p
-collidePA p (x:xs) = collidePA (collided) xs
-    where collided = p { playerAlive = not $ any (collidePtA x) points }
-          points   = map (transformPt b) shipPoints
-          b        = playerBody p
+collidePA p a = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
