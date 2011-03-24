@@ -1,4 +1,7 @@
-module Haskeroids.Player (Player(..), initPlayer, collidePA) where
+module Haskeroids.Player (
+    Player(..),
+    initPlayer,
+    collidePlayer) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
@@ -37,10 +40,12 @@ instance Collider Player where
     collisionRadius = const shipSize
     collisionLines  = interpolatedLines 0
 
-collidePA :: Player -> [Asteroid] -> Player
-collidePA p@(Player _ False) _ = p
-collidePA p [] = p
-collidePA p a = p { playerAlive = not $ any (collides p) a }
+-- | Test collision between the player ship and a list of Colliders
+--   If the ship intersects with any, it is destroyed
+collidePlayer :: Collider a => Player -> [a] -> Player
+collidePlayer p@(Player _ False) _ = p
+collidePlayer p [] = p
+collidePlayer p a = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
