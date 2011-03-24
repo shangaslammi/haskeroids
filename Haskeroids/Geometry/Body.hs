@@ -76,4 +76,4 @@ transform :: Body -> LineSegment -> LineSegment
 transform b = applyXform $ transformPt b
 
 transformPt :: Body -> Vec2 -> Vec2
-transformPt (Body pos a _ _ _ _) =(translatePt pos) . (rotatePt a)
+transformPt (Body pos a _ _ _ _) = (translatePt pos) . (rotatePt a)
