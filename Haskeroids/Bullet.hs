@@ -15,8 +15,9 @@ instance LineRenderable Bullet where
         where b' = interpolatedBody f b
 
 initBullet :: Vec2 -> Float -> Bullet
-initBullet pos angle = Bullet $ Body pos angle vel 0 (pos /-/ vel) angle
-    where vel = polar bulletSpeed angle
+initBullet pos angle = Bullet $ Body (pos' /+/ vel) angle vel 0 pos' angle
+    where vel  = polar bulletSpeed angle
+          pos' = pos /+/ (polar 12.0 angle)
     
 updateBullet :: Bullet -> Bullet
 updateBullet (Bullet b) = Bullet $ updateBody b
