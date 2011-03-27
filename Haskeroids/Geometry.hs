@@ -37,10 +37,12 @@ ptDistanceSqr (x,y) (x',y') = dx*dx + dy*dy
     where dx = x-x'
           dy = y-y'
 
--- | Add two vectors
+-- | Add or subtract two vectors
 (x,y) /+/ (x',y') = (x+x', y+y')
+(x,y) /-/ (x',y') = (x-x', y-y')
 
 infixl 6 /+/
+infixl 6 /-/
 
 -- | Multiply a vector with a scalar
 s */ (x,y) = (s*x, s*y)

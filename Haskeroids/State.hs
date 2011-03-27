@@ -4,6 +4,7 @@ module Haskeroids.State (
     ) where
 
 import Haskeroids.Player
+import Haskeroids.Bullet
 import Haskeroids.Asteroid
 import Haskeroids.Geometry
 import Haskeroids.Render (LineRenderable(..))
@@ -13,13 +14,15 @@ import Haskeroids.Keyboard (Keyboard)
 -- | Data type for tracking game state
 data GameState = GameState {
     statePlayer    :: Player,
-    stateAsteroids :: [Asteroid]
+    stateAsteroids :: [Asteroid],
+    stateBullets   :: [Bullet]
     }
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a) = plines ++ alines
+    interpolatedLines f (GameState p a b) = plines ++ alines ++ blines
         where plines = interpolatedLines f p
               alines = concatMap (interpolatedLines f) a
+              blines = concatMap (interpolatedLines f) b
 
 instance Tickable GameState where
     tick = tickState
@@ -30,14 +33,20 @@ initialGameState = GameState {
     statePlayer    = initPlayer,
     stateAsteroids = [
         newAsteroid (20,50) (1.5,0.7) (-0.02),
-        newAsteroid (700, 10) (-1, 0.4) (-0.015)]
+        newAsteroid (700, 10) (-1, 0.4) (-0.015)],
+    stateBullets   = []
     }
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
-tickState kb s@(GameState pl a) = s {
+tickState kb s@(GameState pl a b) = s {
     statePlayer    = collidePlayer p' a',
-    stateAsteroids = a'
+    stateAsteroids = a',
+    stateBullets   = b'
     }
     where  p' = tick kb pl
            a' = map updateAsteroid a
+           b' = map updateBullet $ newBullets ++ b
+           newBullets = case (playerBullet p') of
+                Nothing -> []
+                Just b  -> [b]
