@@ -17,19 +17,21 @@ import Haskeroids.Bullet
 data Player = Player {
     playerBody   :: Body,
     playerAlive  :: Bool,
-    playerBullet :: Maybe Bullet
+    playerBullet :: Maybe Bullet,
+    playerROF    :: Int
     }
 
 instance LineRenderable Player where
-    interpolatedLines _ (Player _ False _) = []
-    interpolatedLines f (Player b _ _) = map (transform b') $ shipLines
+    interpolatedLines _ (Player _ False _ _) = []
+    interpolatedLines f (Player b _ _ _) = map (transform b') $ shipLines
         where b' = interpolatedBody f b
 
 instance Tickable Player where
-    tick _  p@(Player _ False _) = p
-    tick kb p@(Player b _ _) = p {
+    tick _  p@(Player _ False _ _) = p
+    tick kb p@(Player b _ _ rof) = p {
             playerBody   = updatePlayerBody turn acc b,
-            playerBullet = bullet }
+            playerBullet = bullet,
+            playerROF    = rof' }
         where turn | key turnLeft  = -0.18
                    | key turnRight = 0.18
                    | otherwise     = 0
@@ -37,10 +39,16 @@ instance Tickable Player where
               acc | key thrust = 0.7
                   | otherwise  = 0
                   
-              bullet | key shoot = Just $ initBullet (bodyPos b) (bodyAngle b)
+              bullet | rof == 0 && key shoot = Just $ initBullet (bodyPos b) (bodyAngle b)
                      | otherwise = Nothing
                   
               key = isKeyDown kb
+              
+              rof' = case bullet of
+                        Nothing -> if rof > 0
+                            then rof - 1
+                            else 0
+                        _       -> fireDelay
               
 instance Collider Player where
     collisionCenter = bodyPos . playerBody
@@ -50,13 +58,13 @@ instance Collider Player where
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
 collidePlayer :: Collider a => Player -> [a] -> Player
-collidePlayer p@(Player _ False _) _ = p
+collidePlayer p@(Player _ False _ _) _ = p
 collidePlayer p [] = p
 collidePlayer p a = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
-initPlayer = Player (initBody (400,300) 0) True Nothing
+initPlayer = Player (initBody (400,300) 0) True Nothing 0
 
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body
@@ -64,6 +72,9 @@ updatePlayerBody turn acc = updateBody . damping 0.96 . accForward acc . rotate 
     
 -- | Constant for the ship size
 shipSize = 12.0 :: Float
+
+-- | Constant for the delay (in ticks) between firing bullets
+fireDelay = 5
 
 -- | List of lines that make up the ship hull
 shipLines :: [LineSegment]
