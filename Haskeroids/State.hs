@@ -11,6 +11,8 @@ import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard (Keyboard)
 
+import Data.Maybe
+
 -- | Data type for tracking game state
 data GameState = GameState {
     statePlayer    :: Player,
@@ -46,7 +48,7 @@ tickState kb s@(GameState pl a b) = s {
     }
     where  p' = tick kb pl
            a' = map updateAsteroid a
-           b' = map updateBullet $ newBullets
+           b' = mapMaybe updateBullet $ newBullets
            newBullets = case (playerBullet p') of
                 Nothing -> b
                 Just x  -> x:b
