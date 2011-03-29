@@ -46,7 +46,7 @@ tickState kb s@(GameState pl a b) = s {
     }
     where  p' = tick kb pl
            a' = map updateAsteroid a
-           b' = map updateBullet $ newBullets ++ b
+           b' = map updateBullet $ newBullets
            newBullets = case (playerBullet p') of
-                Nothing -> []
-                Just b  -> [b]
+                Nothing -> b
+                Just x  -> x:b

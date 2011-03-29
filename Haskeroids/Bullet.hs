@@ -5,10 +5,10 @@ import Haskeroids.Render
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 
-data Bullet = Bullet Body
-
 bulletSpeed = 10.0
 bulletLine = LineSegment ((0,0),(0,bulletSpeed))
+
+data Bullet = Bullet Body
 
 instance LineRenderable Bullet where
     interpolatedLines f (Bullet b) = [transform b' bulletLine]
