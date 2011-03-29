@@ -1,5 +1,9 @@
 ﻿
-module Haskeroids.Bullet (Bullet, initBullet, updateBullet) where
+module Haskeroids.Bullet (
+    Bullet,
+    initBullet,
+    updateBullet,
+    bulletActive ) where
 
 import Haskeroids.Render
 import Haskeroids.Geometry
@@ -22,8 +26,8 @@ initBullet pos angle = Bullet bulletLife $ Body (pos' /+/ vel) angle vel 0 pos' 
           pos' = pos /+/ (polar 12.0 angle)
     
 -- | Update a bullet to a new position
-updateBullet :: Bullet -> Maybe Bullet
-updateBullet (Bullet l b) = if l' > 0
-        then Just $ Bullet l' $ updateBody b
-        else Nothing
-    where l' = l - 1
+updateBullet :: Bullet -> Bullet
+updateBullet (Bullet l b) = Bullet (l-1) $ updateBody b
+
+-- | Test wether a bullet is still active
+bulletActive (Bullet l _) = l > 0
