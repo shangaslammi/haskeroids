@@ -11,6 +11,8 @@ import Haskeroids.Geometry.Body
 
 bulletSpeed = 10.0
 bulletLine = LineSegment ((0,0),(0,bulletSpeed))
+
+-- | Number of ticks the bullet exists before expiring
 bulletLife = 70
 
 data Bullet = Bullet Int Body
@@ -29,5 +31,5 @@ initBullet pos angle = Bullet bulletLife $ Body (pos' /+/ vel) angle vel 0 pos' 
 updateBullet :: Bullet -> Bullet
 updateBullet (Bullet l b) = Bullet (l-1) $ updateBody b
 
--- | Test wether a bullet is still active
+-- | Test wether a bullet is still active (i.e. not expired)
 bulletActive (Bullet l _) = l > 0
