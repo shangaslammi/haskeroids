@@ -26,7 +26,7 @@ instance LineRenderable GameState where
 
 instance Tickable GameState where
     tick = tickState
-    
+
 -- | Generate the initial game state
 initialGameState :: GameState
 initialGameState = GameState {
@@ -40,9 +40,9 @@ initialGameState = GameState {
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
 tickState kb s@(GameState pl a b) = s {
-    statePlayer    = collidePlayer p' a',
+    statePlayer    = collidePlayer a' p',
     stateAsteroids = a',
-    stateBullets   = b'
+    stateBullets   = collideBullets a' b'
     }
     where  p' = tick kb pl
            a' = map updateAsteroid a

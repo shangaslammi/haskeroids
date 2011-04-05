@@ -27,7 +27,7 @@ instance LineRenderable Player where
         where b' = interpolatedBody f b
 
 instance Tickable Player where
-    tick _  p@(Player _ False _ _) = p
+    tick _  p@(Player _ False _ _) = p { playerBullet = Nothing }
     tick kb p@(Player b _ _ rof) = p {
             playerBody   = updatePlayerBody turn acc b,
             playerBullet = bullet,
@@ -35,21 +35,21 @@ instance Tickable Player where
         where turn | key turnLeft  = -0.18
                    | key turnRight = 0.18
                    | otherwise     = 0
-              
+
               acc | key thrust = 0.7
                   | otherwise  = 0
-                  
+
               bullet | rof == 0 && key shoot = Just $ initBullet (bodyPos b) (bodyAngle b)
                      | otherwise = Nothing
-                  
+
               key = isKeyDown kb
-              
+
               rof' = case bullet of
                         Nothing -> if rof > 0
                             then rof - 1
                             else 0
                         _       -> fireDelay
-              
+
 instance Collider Player where
     collisionCenter = bodyPos . playerBody
     collisionRadius = const shipSize
@@ -57,10 +57,10 @@ instance Collider Player where
 
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
-collidePlayer :: Collider a => Player -> [a] -> Player
-collidePlayer p@(Player _ False _ _) _ = p
-collidePlayer p [] = p
-collidePlayer p a = p { playerAlive = not $ any (collides p) a }
+collidePlayer :: Collider a => [a] -> Player -> Player
+collidePlayer _ p@(Player _ False _ _) = p
+collidePlayer [] p = p
+collidePlayer a p = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
@@ -69,7 +69,7 @@ initPlayer = Player (initBody (400,300) 0) True Nothing 0
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body
 updatePlayerBody turn acc = updateBody . damping 0.96 . accForward acc . rotate turn
-    
+
 -- | Constant for the ship size
 shipSize = 12.0 :: Float
 
