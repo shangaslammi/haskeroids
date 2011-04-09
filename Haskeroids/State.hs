@@ -41,10 +41,12 @@ initialGameState = GameState {
 tickState :: Keyboard -> GameState -> GameState
 tickState kb s@(GameState pl a b) = s {
     statePlayer    = collidePlayer a' p',
-    stateAsteroids = a',
-    stateBullets   = collideBullets a' b'
+    stateAsteroids = filter asteroidAlive a'',
+    stateBullets   = b''
     }
-    where  p' = tick kb pl
+    where  (b'', a'') = collideAsteroids b' a'
+
+           p' = tick kb pl
            a' = map updateAsteroid a
            b' = filter bulletActive . map updateBullet $ newBullets
            newBullets = case (playerBullet p') of
