@@ -3,8 +3,7 @@ module Haskeroids.Bullet (
     Bullet,
     initBullet,
     updateBullet,
-    bulletActive,
-    collideBullets ) where
+    bulletActive ) where
 
 import Haskeroids.Render
 import Haskeroids.Collision
@@ -44,10 +43,6 @@ initBullet pos angle = Bullet bulletMaxLife body
 updateBullet :: Bullet -> Bullet
 updateBullet (Bullet l b) = Bullet (l-1) $ updateBody b
 
--- | Collide bullets with other colliders
-collideBullets :: Collider a => [a] -> [Bullet] -> [Bullet]
-collideBullets c = filter (not.doesCollide)
-    where doesCollide = or . (collides <$> c <*>) . return
-
 -- | Test wether a bullet is still active
+bulletActive :: Bullet -> Bool
 bulletActive (Bullet l _) = l > 0
