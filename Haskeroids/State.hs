@@ -6,7 +6,6 @@ module Haskeroids.State (
 import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
-import Haskeroids.Geometry
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard (Keyboard)

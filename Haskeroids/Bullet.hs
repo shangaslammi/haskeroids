@@ -50,4 +50,5 @@ collideBullets c = filter (not.doesCollide)
     where doesCollide = or . (collides <$> c <*>) . return
 
 -- | Test wether a bullet is still active
+bulletActive :: Bullet -> Bool
 bulletActive (Bullet l _) = l > 0

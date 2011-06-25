@@ -42,7 +42,7 @@ numVertices Medium = 8
 numVertices Large  = 12
 
 -- | Get the line segments for an asteroid size
-asteroidLines sz = pointsToSegments $ pts sz
+asteroidLines = pointsToSegments . pts
     where pts sz  = polarPoints (numVertices sz) (radius sz)
           polarPoints s r = map (polar r) [0.0,step..2.0*pi]
              where step = 2.0*pi/(fromIntegral s)
