@@ -3,6 +3,8 @@ module Haskeroids.State (
     initialGameState,
     ) where
 
+import Data.List (partition)
+    
 import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
@@ -31,8 +33,8 @@ initialGameState :: GameState
 initialGameState = GameState {
     statePlayer    = initPlayer,
     stateAsteroids = [
-        newAsteroid (20,50) (1.5,0.7) (-0.02),
-        newAsteroid (700, 10) (-1, 0.4) (-0.015)],
+        newAsteroid Large (20,50) (1.5,0.7) (-0.02),
+        newAsteroid Large (700, 10) (-1, 0.4) (-0.015)],
     stateBullets   = []
     }
 
@@ -40,10 +42,11 @@ initialGameState = GameState {
 tickState :: Keyboard -> GameState -> GameState
 tickState kb s@(GameState pl a b) = s {
     statePlayer    = collidePlayer a' p',
-    stateAsteroids = filter asteroidAlive a'',
+    stateAsteroids = aa,
     stateBullets   = b''
     }
     where  (b'', a'') = collideAsteroids b' a'
+           (aa, ad)   = partition asteroidAlive a''
 
            p' = tick kb pl
            a' = map updateAsteroid a

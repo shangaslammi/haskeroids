@@ -1,5 +1,6 @@
 ﻿module Haskeroids.Asteroid (
     Asteroid,
+    Size(..),
     newAsteroid,
     updateAsteroid,
     collideAsteroids,
@@ -11,8 +12,11 @@ import Haskeroids.Geometry.Body
 import Haskeroids.Render
 import Haskeroids.Collision
 
+import Control.Monad (replicateM)
+import System.Random (randomRIO)
+
 type Hitpoints = Int
-data Size = Small|Medium|Large deriving (Ord, Eq)
+data Size = Small|Medium|Large deriving (Ord, Eq, Enum)
 data Asteroid = Asteroid {
     asteroidSize :: Size,
     asteroidBody :: Body,
@@ -28,8 +32,8 @@ instance Collider Asteroid where
     collisionLines = interpolatedLines 0
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
-newAsteroid :: Vec2 -> Vec2 -> Float -> Asteroid
-newAsteroid pos v r = Asteroid Large (Body pos 0 v r pos 0) 16
+newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> Asteroid
+newAsteroid sz pos v r = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz)
 
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
@@ -64,6 +68,26 @@ radius Small  = 14
 radius Medium = 28
 radius Large  = 56
 
+maxHits Small  = 4
+maxHits Medium = 8
+maxHits Large  = 16
+
+-- | Spawn random asteroids
+spawnNewAsteroids :: Asteroid -> IO [Asteroid]
+spawnNewAsteroids (Asteroid sz b _)
+    | sz == Small = return []
+    | otherwise   = replicateM 3 $ randomAsteroid (pred sz) (bodyPos b)
+
+randomAsteroid :: Size -> Vec2 -> IO Asteroid
+randomAsteroid sz pos = do
+    dx <- randomRIO (-r*2.0, r*2.0)
+    dy <- randomRIO (-r*2.0, r*2.0)
+    vx <- randomRIO (-10.0/r, 10.0/r)
+    vy <- randomRIO (-10.0/r, 10.0/r)
+    r  <- randomRIO (-3.0/r, 3.0/r)
+    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) r 
+    where r = radius sz
+    
 -- | Get the number of vertices for an asteroid size
 numVertices :: Size -> Int
 numVertices Small  = 6
