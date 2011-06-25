@@ -1,4 +1,4 @@
-﻿module Haskeroids.Geometry.Body (
+module Haskeroids.Geometry.Body (
     Body (..),
     transform,
     transformPt,
