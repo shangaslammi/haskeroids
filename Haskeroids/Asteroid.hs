@@ -35,6 +35,7 @@ newAsteroid pos v r = Asteroid Large (Body pos 0 v r pos 0) 16
 updateAsteroid :: Asteroid -> Asteroid
 updateAsteroid (Asteroid sz b hp) = Asteroid sz (updateBody b) hp
 
+-- | Reduce asteroid hitpoints by one
 damageAsteroid :: Asteroid -> Asteroid
 damageAsteroid a = a {asteroidHits = (asteroidHits a) - 1}
 
@@ -53,6 +54,7 @@ collideAsteroids cs = foldr go (cs,[])
     where go a (cs,as) = (cs', a':as)
             where (cs',a') = collideAsteroid cs a
 
+-- | Check if the asteroid still has hitpoints left
 asteroidAlive :: Asteroid -> Bool
 asteroidAlive = (0<).asteroidHits
 
