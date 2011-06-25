@@ -31,7 +31,7 @@ initCallbackRefs = do
 
 -- | Run the game logic, render the view and swap display buffers
 renderViewport :: CallbackRefs -> IO ()
-renderViewport refs@(CallbackRefs ar tr kb rr) = do
+renderViewport (CallbackRefs ar tr kb rr) = do
     current <- getPOSIXTime
     prev <- readIORef tr
     accum <- readIORef ar

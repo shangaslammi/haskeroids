@@ -18,7 +18,7 @@ polar m a = (m * sin a, m * (-cos a))
 -- | Transform a list of points into a list of connected line segments
 pointsToSegments :: [Vec2] -> [LineSegment]
 pointsToSegments (p:p':[])     = [LineSegment (p,p')]
-pointsToSegments (p:t@(p':ps)) = (LineSegment (p,p')) : pointsToSegments t
+pointsToSegments (p:t@(p':_)) = (LineSegment (p,p')) : pointsToSegments t
 
 -- | Give a delta vector that needs to be added to point to wrap it around the
 --   screen edge.
