@@ -1,10 +1,11 @@
 module Haskeroids.State (
     GameState(..),
     initialGameState,
+    initNewAsteroids
     ) where
 
 import Data.List (partition)
-    
+
 import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
@@ -16,11 +17,12 @@ import Haskeroids.Keyboard (Keyboard)
 data GameState = GameState {
     statePlayer    :: Player,
     stateAsteroids :: [Asteroid],
-    stateBullets   :: [Bullet]
+    stateBullets   :: [Bullet],
+    newAsteroids   :: [IO Asteroid]
     }
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a b) = plines ++ alines ++ blines
+    interpolatedLines f (GameState p a b _) = plines ++ alines ++ blines
         where plines = interpolatedLines f p
               alines = concatMap (interpolatedLines f) a
               blines = concatMap (interpolatedLines f) b
@@ -35,15 +37,24 @@ initialGameState = GameState {
     stateAsteroids = [
         newAsteroid Large (20,50) (1.5,0.7) (-0.02),
         newAsteroid Large (700, 10) (-1, 0.4) (-0.015)],
-    stateBullets   = []
+    stateBullets   = [],
+    newAsteroids   = []
     }
+
+-- | Initialize new random asteroids in the IO monad
+initNewAsteroids :: GameState -> IO GameState
+initNewAsteroids st = do
+    n <- sequence $ newAsteroids st
+    return st { stateAsteroids = n ++ (stateAsteroids st) }
+
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
-tickState kb s@(GameState pl a b) = s {
+tickState kb s@(GameState pl a b _) = s {
     statePlayer    = collidePlayer a' p',
     stateAsteroids = aa,
-    stateBullets   = b''
+    stateBullets   = b'',
+    newAsteroids   = concatMap spawnNewAsteroids ad
     }
     where  (b'', a'') = collideAsteroids b' a'
            (aa, ad)   = partition asteroidAlive a''

@@ -12,7 +12,7 @@ import Graphics.UI.GLUT
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Tick
 import Haskeroids.Keyboard
-import Haskeroids.State (GameState, initialGameState)
+import Haskeroids.State (GameState, initialGameState, initNewAsteroids)
 
 type KeyboardRef = IORef Keyboard
 type TimeRef     = IORef POSIXTime
@@ -36,25 +36,28 @@ renderViewport (CallbackRefs ar tr kb rr) = do
     prev <- readIORef tr
     accum <- readIORef ar
     keys <- readIORef kb
-    
+
     let frameTime = min 0.1 $ current - prev
         newAccum  = accum + frameTime
 
     let consumeAccum acc = if acc >= 0.0333
             then do
-               modifyIORef rr $ tick keys
+               st <- readIORef rr
+               let st' = tick keys st
+               newSt <- initNewAsteroids st'
+               writeIORef rr newSt
                consumeAccum $ acc - 0.0333
             else return acc
-    
+
     newAccum' <- consumeAccum newAccum
-    
+
     writeIORef tr current
     writeIORef ar newAccum'
-    
+
     let interpolation = realToFrac $ newAccum' / 0.0333
-    
+
     r <- readIORef rr
-    
+
     clear [ColorBuffer]
     renderInterpolated interpolation r
     swapBuffers
