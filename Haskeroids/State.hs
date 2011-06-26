@@ -4,7 +4,7 @@ module Haskeroids.State (
     initNewAsteroids
     ) where
 
-import Data.List (partition)
+import Data.List (partition, replicate)
 
 import Haskeroids.Player
 import Haskeroids.Bullet
@@ -34,11 +34,9 @@ instance Tickable GameState where
 initialGameState :: GameState
 initialGameState = GameState {
     statePlayer    = initPlayer,
-    stateAsteroids = [
-        newAsteroid Large (20,50) (1.5,0.7) (-0.02),
-        newAsteroid Large (700, 10) (-1, 0.4) (-0.015)],
+    stateAsteroids = [],
     stateBullets   = [],
-    newAsteroids   = []
+    newAsteroids   = replicate 3 genInitialAsteroid
     }
 
 -- | Initialize new random asteroids in the IO monad

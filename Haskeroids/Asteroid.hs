@@ -1,7 +1,7 @@
 ﻿module Haskeroids.Asteroid (
     Asteroid,
     Size(..),
-    newAsteroid,
+    genInitialAsteroid,
     updateAsteroid,
     spawnNewAsteroids,
     collideAsteroids,
@@ -13,32 +13,34 @@ import Haskeroids.Geometry.Body
 import Haskeroids.Render
 import Haskeroids.Collision
 
-import Data.List (replicate)
+import Data.List (replicate, sort)
+import Control.Monad (replicateM)
 import System.Random (randomRIO)
 
 type Hitpoints = Int
 data Size = Small|Medium|Large deriving (Ord, Eq, Enum)
 data Asteroid = Asteroid {
-    asteroidSize :: Size,
-    asteroidBody :: Body,
-    asteroidHits :: Hitpoints }
+    asteroidSize  :: Size,
+    asteroidBody  :: Body,
+    asteroidHits  :: Hitpoints,
+    asteroidLines :: [LineSegment] }
 
 instance LineRenderable Asteroid where
-    interpolatedLines f (Asteroid sz b _) = map (transform b') $ asteroidLines sz
+    interpolatedLines f (Asteroid sz b _ lns) = map (transform b') lns
         where b' = interpolatedBody f b
 
 instance Collider Asteroid where
-    collisionCenter (Asteroid _ b _)  = bodyPos b
-    collisionRadius (Asteroid sz _ _) = radius sz
-    collisionLines = interpolatedLines 0
+    collisionCenter = bodyPos . asteroidBody
+    collisionRadius = radius . asteroidSize
+    collisionLines  = interpolatedLines 0
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
-newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> Asteroid
-newAsteroid sz pos v r = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz)
+newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
+newAsteroid sz pos v r lns = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz) lns
 
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
-updateAsteroid (Asteroid sz b hp) = Asteroid sz (updateBody b) hp
+updateAsteroid a = a { asteroidBody = (updateBody $ asteroidBody a) }
 
 -- | Reduce asteroid hitpoints by one
 damageAsteroid :: Asteroid -> Asteroid
@@ -75,18 +77,19 @@ maxHits Large  = 16
 
 -- | Spawn random asteroids
 spawnNewAsteroids :: Asteroid -> [IO Asteroid]
-spawnNewAsteroids (Asteroid sz b _)
+spawnNewAsteroids (Asteroid sz b _ _)
     | sz == Small = []
     | otherwise   = replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
 
 randomAsteroid :: Size -> Vec2 -> IO Asteroid
 randomAsteroid sz pos = do
-    dx <- randomRIO (-r*1.0, r*1.0)
-    dy <- randomRIO (-r*1.0, r*1.0)
-    vx <- randomRIO (-40.0/r, 40.0/r)
-    vy <- randomRIO (-40.0/r, 40.0/r)
-    r  <- randomRIO (-3.0/r, 3.0/r)
-    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) r
+    dx  <- randomRIO (-r*1.0, r*1.0)
+    dy  <- randomRIO (-r*1.0, r*1.0)
+    vx  <- randomRIO (-40.0/r, 40.0/r)
+    vy  <- randomRIO (-40.0/r, 40.0/r)
+    r   <- randomRIO (-3.0/r, 3.0/r)
+    lns <- genAsteroidLines sz
+    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) r lns
     where r = radius sz
 
 -- | Get the number of vertices for an asteroid size
@@ -95,8 +98,24 @@ numVertices Small  = 9
 numVertices Medium = 13
 numVertices Large  = 17
 
--- | Get the line segments for an asteroid size
-asteroidLines = pointsToSegments . pts
-    where pts sz  = polarPoints (numVertices sz) (radius sz)
-          polarPoints s r = map (polar r) [0.0,step..2.0*pi]
-             where step = 2.0*pi/(fromIntegral s)
+-- | Generate an initial asteroid in the level
+genInitialAsteroid :: IO Asteroid
+genInitialAsteroid = do
+    ang  <- randomRIO (0, 2.0*pi)
+    xrad <- randomRIO (140, 400)
+    yrad <- randomRIO (140, 300)
+    let x = (cos ang) * xrad
+    let y = (sin ang) * yrad
+    randomAsteroid Large (x,y)
+
+-- | Generate the line segments for an asteroid size
+genAsteroidLines :: Size -> IO [LineSegment]
+genAsteroidLines sz = do
+    radii  <- replicateM numPts $ randomRIO (rad*0.5, rad)
+    angvar <- replicateM numPts $ randomRIO (-0.01*pi, 0.01*pi)
+    let angles = sort $ zipWith (+) angvar [0.0,step..2.0*pi]
+    let points = zipWith polar radii angles
+    return $ pointsToSegments $ points ++ [head points]
+    where numPts = numVertices sz
+          rad    = radius sz
+          step   = 2.0*pi/(fromIntegral numPts + 1)

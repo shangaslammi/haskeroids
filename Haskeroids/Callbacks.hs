@@ -42,10 +42,9 @@ renderViewport (CallbackRefs ar tr kb rr) = do
 
     let consumeAccum acc = if acc >= 0.0333
             then do
-               st <- readIORef rr
-               let st' = tick keys st
-               newSt <- initNewAsteroids st'
-               writeIORef rr newSt
+               st  <- readIORef rr
+               st' <- initNewAsteroids st
+               writeIORef rr $ tick keys st'
                consumeAccum $ acc - 0.0333
             else return acc
 
