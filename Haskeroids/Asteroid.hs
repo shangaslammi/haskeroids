@@ -1,4 +1,4 @@
-﻿module Haskeroids.Asteroid (
+module Haskeroids.Asteroid (
     Asteroid,
     Size(..),
     genInitialAsteroid,
@@ -36,15 +36,15 @@ instance Collider Asteroid where
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
 newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
-newAsteroid sz pos v r lns = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz) lns
+newAsteroid sz pos v r = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz)
 
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
-updateAsteroid a = a { asteroidBody = (updateBody $ asteroidBody a) }
+updateAsteroid a = a { asteroidBody = updateBody $ asteroidBody a }
 
 -- | Reduce asteroid hitpoints by one
 damageAsteroid :: Asteroid -> Asteroid
-damageAsteroid a = a {asteroidHits = (asteroidHits a) - 1}
+damageAsteroid a = a {asteroidHits = asteroidHits a - 1}
 
 -- | Check if the asteroid still has hitpoints left
 asteroidAlive :: Asteroid -> Bool
@@ -104,8 +104,8 @@ genInitialAsteroid = do
     ang  <- randomRIO (0, 2.0*pi)
     xrad <- randomRIO (140, 400)
     yrad <- randomRIO (140, 300)
-    let x = (cos ang) * xrad
-    let y = (sin ang) * yrad
+    let x = cos ang * xrad
+    let y = sin ang * yrad
     randomAsteroid Large (x,y)
 
 -- | Generate the line segments for an asteroid size

@@ -23,7 +23,7 @@ data Player = Player {
 
 instance LineRenderable Player where
     interpolatedLines _ (Player _ False _ _) = []
-    interpolatedLines f (Player b _ _ _) = map (transform b') $ shipLines
+    interpolatedLines f (Player b _ _ _) = map (transform b') shipLines
         where b' = interpolatedBody f b
 
 instance Tickable Player where

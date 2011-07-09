@@ -1,4 +1,4 @@
-﻿module Haskeroids.Controls (
+module Haskeroids.Controls (
     turnRight,
     turnLeft,
     thrust,

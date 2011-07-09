@@ -8,7 +8,7 @@ import Haskeroids.Geometry.Transform
 -- | Object that can be rendered as a group of lines
 class LineRenderable r where
     interpolatedLines :: Float -> r -> [LineSegment]
-    
+
     renderInterpolated :: Float -> r -> IO()
     renderInterpolated f = renderLines . interpolatedLines f
 
@@ -28,9 +28,9 @@ wrapLines = foldr go []
                 | otherwise = l:acc
             where
               both   = first && second && w/= w'
-              first  = (w /= (0,0))
-              second = (w' /= (0,0))
-              
+              first  = w /= (0,0)
+              second = w' /= (0,0)
+
               w   = wrapper p
               w'  = wrapper p'
               l'  = applyXform (translatePt w) l

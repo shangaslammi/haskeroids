@@ -1,4 +1,4 @@
-﻿
+
 module Haskeroids.Bullet (
     Bullet,
     initBullet,
@@ -37,7 +37,7 @@ initBullet :: Vec2 -> Float -> Bullet
 initBullet pos angle = Bullet bulletMaxLife body
     where body = Body pos' angle vel 0 pos' angle
           vel  = polar bulletSpeed angle
-          pos' = pos /+/ (polar 12.0 angle)
+          pos' = pos /+/ polar 12.0 angle
 
 -- | Update a bullet to a new position
 updateBullet :: Bullet -> Bullet

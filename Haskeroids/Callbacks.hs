@@ -23,7 +23,7 @@ data CallbackRefs = CallbackRefs TimeRef TimeRef KeyboardRef StateRef
 -- | Initialize a new group of callback references
 initCallbackRefs :: IO CallbackRefs
 initCallbackRefs = do
-    accum <- newIORef $ 0.0333
+    accum <- newIORef 0.0333
     prev  <- getPOSIXTime >>= newIORef
     keyb  <- newIORef initKeyboard
     st    <- newIORef initialGameState

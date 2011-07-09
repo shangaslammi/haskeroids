@@ -12,15 +12,15 @@ module Haskeroids.Geometry.Body (
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Transform
-    
+
 -- | Data type that contains the position and orientation of a rigid body
 data Body = Body {
     bodyPos   :: Vec2,
     bodyAngle :: Float,
-    
+
     bodyVelocity :: Vec2,
     bodyRotation :: Float,
-    
+
     prevPos   :: Vec2,
     prevAngle :: Float
     }
@@ -32,10 +32,10 @@ initBody pos angle = Body pos angle (0,0) 0 pos angle
 -- | Update the position and orientation of a body according to its current
 --   velocity and rotation.
 updateBody :: Body -> Body
-updateBody b = b { 
+updateBody b = b {
     bodyPos = pos' /+/ wrap,  bodyAngle = a',
     prevPos = pos  /+/ wrap,  prevAngle = a }
-    
+
     where a    = bodyAngle b
           pos  = bodyPos b
           pos' = pos /+/ bodyVelocity b
@@ -48,10 +48,10 @@ interpolatedBody :: Float -- ^ interpolation point
                  -> Body  -- ^ interpolated body
 
 interpolatedBody i b = b { bodyPos = pos', bodyAngle = a' }
-    where pos' = (bodyPos b) /* i /+/ (prevPos b) /* i'
-          a'   = (bodyAngle b) * i + (prevAngle b) * i'
+    where pos' = bodyPos b /* i /+/ prevPos b /* i'
+          a'   = bodyAngle b * i + prevAngle b * i'
           i'   = 1.0 - i
-          
+
 -- | Accelerate a rigid body with the given vector
 accelerate :: Vec2 -> Body -> Body
 accelerate (ax,ay) b = b { bodyVelocity = newVelocity }
@@ -62,18 +62,18 @@ accelerate (ax,ay) b = b { bodyVelocity = newVelocity }
 --   given magnitude.
 accForward :: Float -> Body -> Body
 accForward m b = accelerate (polar m (bodyAngle b)) b
-          
+
 -- | Apply a damping effect to velocity using the given coefficient
 damping :: Float -> Body -> Body
 damping coefficient b = b { bodyVelocity = coefficient */ bodyVelocity b }
-          
+
 -- | Rotate a body by the given amount per tick
 rotate :: Float -> Body -> Body
 rotate nr b = b {bodyRotation = nr}
-    
+
 -- | Transform a line segment according to body position and orientation
 transform :: Body -> LineSegment -> LineSegment
 transform b = applyXform $ transformPt b
 
 transformPt :: Body -> Vec2 -> Vec2
-transformPt (Body pos a _ _ _ _) = (translatePt pos) . (rotatePt a)
+transformPt (Body pos a _ _ _ _) = translatePt pos . rotatePt a

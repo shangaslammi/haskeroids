@@ -1,4 +1,4 @@
-﻿module Haskeroids.Keyboard (
+module Haskeroids.Keyboard (
     Keyboard,
     initKeyboard,
     handleKeyEvent,

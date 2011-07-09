@@ -43,7 +43,7 @@ initialGameState = GameState {
 initNewAsteroids :: GameState -> IO GameState
 initNewAsteroids st = do
     n <- sequence $ newAsteroids st
-    return st { stateAsteroids = n ++ (stateAsteroids st) }
+    return st { stateAsteroids = n ++ stateAsteroids st }
 
 
 -- | Tick state into a new game state
@@ -60,6 +60,6 @@ tickState kb s@(GameState pl a b _) = s {
            p' = tick kb pl
            a' = map updateAsteroid a
            b' = filter bulletActive . map updateBullet $ newBullets
-           newBullets = case (playerBullet p') of
+           newBullets = case playerBullet p' of
                 Nothing -> b
                 Just x  -> x:b

@@ -7,19 +7,19 @@ import Haskeroids.Geometry
 class Collider c where
     -- | Line segments used for collision detection
     collisionLines :: c -> [LineSegment]
-    
+
     -- | Center and radius of a bounding circle
     collisionCenter :: c -> Vec2
     collisionRadius :: c -> Float
-    
+
     -- | Test if two colliders intersect
     collides :: (Collider d) => c -> d -> Bool
     collides c c' = canCollide && doesCollide
         where canCollide  = distSqr < radius*radius
               doesCollide = or $ lineCollision <$> cl <*> cl'
-              
+
               distSqr = ptDistanceSqr (collisionCenter c) (collisionCenter c')
-              radius  = (collisionRadius c) + (collisionRadius c')
+              radius  = collisionRadius c + collisionRadius c'
               cl  = collisionLines c
               cl' = collisionLines c'
 
