@@ -1,5 +1,6 @@
 module Haskeroids.Asteroid (
     Asteroid,
+    RandomAsteroid,
     Size(..),
     genInitialAsteroid,
     updateAsteroid,
@@ -25,6 +26,8 @@ data Asteroid = Asteroid {
     asteroidHits  :: Hitpoints,
     asteroidLines :: [LineSegment] }
 
+type RandomAsteroid = IO Asteroid
+
 instance LineRenderable Asteroid where
     interpolatedLines f (Asteroid sz b _ lns) = map (transform b') lns
         where b' = interpolatedBody f b
@@ -33,6 +36,24 @@ instance Collider Asteroid where
     collisionCenter = bodyPos . asteroidBody
     collisionRadius = radius . asteroidSize
     collisionLines  = interpolatedLines 0
+
+-- | Radius for an asteroid
+radius :: Size -> Float
+radius Small  = 14
+radius Medium = 32
+radius Large  = 70
+
+-- | Hitpoints for an asteroid
+maxHits :: Size -> Int
+maxHits Small  = 4
+maxHits Medium = 8
+maxHits Large  = 16
+
+-- | Number of vertices for an asteroid
+numVertices :: Size -> Int
+numVertices Small  = 9
+numVertices Medium = 13
+numVertices Large  = 17
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
 newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
@@ -65,23 +86,13 @@ collideAsteroids cs = foldr go (cs,[])
     where go a (cs,as) = (cs', a':as)
             where (cs',a') = collideAsteroid cs a
 
--- | Get the radius for an asteroid size
-radius :: Size -> Float
-radius Small  = 14
-radius Medium = 32
-radius Large  = 70
-
-maxHits Small  = 4
-maxHits Medium = 8
-maxHits Large  = 16
-
 -- | Spawn random asteroids
-spawnNewAsteroids :: Asteroid -> [IO Asteroid]
+spawnNewAsteroids :: Asteroid -> [RandomAsteroid]
 spawnNewAsteroids (Asteroid sz b _ _)
     | sz == Small = []
     | otherwise   = replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
 
-randomAsteroid :: Size -> Vec2 -> IO Asteroid
+randomAsteroid :: Size -> Vec2 -> RandomAsteroid
 randomAsteroid sz pos = do
     dx  <- randomRIO (-r*1.0, r*1.0)
     dy  <- randomRIO (-r*1.0, r*1.0)
@@ -92,14 +103,8 @@ randomAsteroid sz pos = do
     return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) r lns
     where r = radius sz
 
--- | Get the number of vertices for an asteroid size
-numVertices :: Size -> Int
-numVertices Small  = 9
-numVertices Medium = 13
-numVertices Large  = 17
-
 -- | Generate an initial asteroid in the level
-genInitialAsteroid :: IO Asteroid
+genInitialAsteroid :: RandomAsteroid
 genInitialAsteroid = do
     ang  <- randomRIO (0, 2.0*pi)
     xrad <- randomRIO (140, 400)

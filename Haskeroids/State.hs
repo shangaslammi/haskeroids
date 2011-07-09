@@ -18,7 +18,7 @@ data GameState = GameState {
     statePlayer    :: Player,
     stateAsteroids :: [Asteroid],
     stateBullets   :: [Bullet],
-    newAsteroids   :: [IO Asteroid]
+    newAsteroids   :: [RandomAsteroid]
     }
 
 instance LineRenderable GameState where
