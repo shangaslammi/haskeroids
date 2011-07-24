@@ -85,7 +85,7 @@ collidePlayer a  p = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
-initPlayer = Player (initBody (400,300) 0) True Nothing 0
+initPlayer = Player (initBody (400,300) 0 (0,0) 0) True Nothing 0
 
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body

@@ -57,7 +57,7 @@ numVertices Large  = 17
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
 newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
-newAsteroid sz pos v r = Asteroid sz (Body pos 0 v r pos 0) (maxHits sz)
+newAsteroid sz pos v r = Asteroid sz (initBody pos 0 v r) (maxHits sz)
 
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid

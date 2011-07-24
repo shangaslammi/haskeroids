@@ -1,5 +1,6 @@
 module Haskeroids.Random
     ( randomBracket
+    , randomBetween
     , randomPair
     , randomAngle
     , randomElliptical
@@ -8,6 +9,9 @@ module Haskeroids.Random
 
 import System.Random (Random, randomRIO)
 import Control.Monad (liftM2, replicateM)
+
+randomBetween :: Random a => (a,a) -> IO a
+randomBetween = randomRIO
 
 randomBracket :: (Num a, Random a) => a -> IO a
 randomBracket a = randomRIO (-a, a)

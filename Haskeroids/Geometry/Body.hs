@@ -26,8 +26,8 @@ data Body = Body
     }
 
 -- | Initialize a new rigid body in the given location
-initBody :: Vec2 -> Float -> Body
-initBody pos angle = Body pos angle (0,0) 0 pos angle
+initBody :: Vec2 -> Float -> Vec2 -> Float -> Body
+initBody pos angle v rot = Body (pos /+/ v) (angle + rot) v rot pos angle
 
 -- | Update the position and orientation of a body according to its current
 --   velocity and rotation.
