@@ -62,6 +62,13 @@ initParticle (NewParticle p r d spr spd lt) = do
         , particleLife = l
         }
 
+tickParticles :: ParticleSystem -> ParticleSystem
+tickParticles (ParticleSystem ps) = ParticleSystem $ foldr go [] ps where
+    go (Particle body life) acc
+        | life == 0 = acc
+        | otherwise = Particle (updateBody body) (life-1) : acc
+
+
 addParticle :: NewParticle -> ParticleGen ()
 addParticle = tell . return
 
