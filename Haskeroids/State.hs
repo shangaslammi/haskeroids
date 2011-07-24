@@ -1,8 +1,7 @@
 module Haskeroids.State
     ( GameState(..)
     , initialGameState
-    , initNewAsteroids
-    , tickState
+    , tickStateIO
     ) where
 
 import Data.List (partition, replicate)
@@ -45,9 +44,17 @@ initNewAsteroids st = do
     n <- sequence $ newAsteroids st
     return st { stateAsteroids = n ++ stateAsteroids st }
 
+-- | Function that combines pure calculations and initializing random
+--   objects in the IO monad
+tickStateIO :: Keyboard -> GameState -> IO GameState
+tickStateIO kb s = do
+    (s',np) <- fmap (runParticleGen . tickState kb) $ initNewAsteroids s
+    ps <- initNewParticles np $ stateParticles s'
+    return s' { stateParticles = ps }
+
 -- | Tick state into a new game state
-tickState :: Keyboard -> GameState -> GameState
-tickState kb s@(GameState pl a b p _) = s
+tickState :: Keyboard -> GameState -> ParticleGen GameState
+tickState kb s@(GameState pl a b p _) = return s
     { statePlayer    = collidePlayer a' p'
     , stateAsteroids = aa
     , stateBullets   = b''

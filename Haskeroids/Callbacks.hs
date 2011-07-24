@@ -47,9 +47,7 @@ renderViewport (ar, pr, kb, sr) = do
 
     let consumeAccum acc s
             | acc >= secPerFrame =
-                initNewAsteroids s
-                    >>= return . tickState keys
-                    >>= consumeAccum (acc - secPerFrame)
+                tickStateIO keys s >>= consumeAccum (acc - secPerFrame)
             | otherwise = return (acc, s)
 
         frameTime = min (current - prev) maxFrameTime

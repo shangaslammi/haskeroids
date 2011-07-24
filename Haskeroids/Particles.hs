@@ -4,6 +4,8 @@ module Haskeroids.Particles
     , ParticleGen
     , initParticleSystem
     , initNewParticles
+    , addParticle
+    , runParticleGen
     ) where
 
 import Haskeroids.Render
@@ -71,6 +73,9 @@ tickParticles (ParticleSystem ps) = ParticleSystem $ foldr go [] ps where
 
 addParticle :: NewParticle -> ParticleGen ()
 addParticle = tell . return
+
+runParticleGen :: ParticleGen a -> (a, [NewParticle])
+runParticleGen = runWriter
 
 initNewParticles :: [NewParticle] -> ParticleSystem -> IO ParticleSystem
 initNewParticles nps (ParticleSystem ps) = do
