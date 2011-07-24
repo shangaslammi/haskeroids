@@ -17,12 +17,13 @@ import Haskeroids.Geometry.Body
 
 import Control.Monad.Writer
 
-particleLine :: LineSegment
-particleLine = LineSegment ((0,1),(0,-1))
+mkParticleLine :: Float -> LineSegment
+mkParticleLine sz = LineSegment ((0,sz),(0,-sz))
 
 data Particle = Particle
     { particleBody :: Body
     , particleLife :: Int
+    , particleLine :: LineSegment
     }
 
 data NewParticle = NewParticle
@@ -32,6 +33,7 @@ data NewParticle = NewParticle
     , npSpread    :: Float
     , npSpeed     :: SpeedRange
     , npLifeTime  :: LifeRange
+    , npSize      :: SizeRange
     }
 
 type RandomParticle = IO Particle
@@ -39,6 +41,7 @@ type Direction      = Float
 type Spread         = Float
 type SpeedRange     = (Float, Float)
 type LifeRange      = (Int, Int)
+type SizeRange      = (Float, Float)
 type ParticleGen    = Writer [NewParticle]
 
 newtype ParticleSystem = ParticleSystem [Particle]
@@ -47,30 +50,32 @@ instance LineRenderable ParticleSystem where
     interpolatedLines f (ParticleSystem ps) = map (interpolateParticle f) ps
 
 interpolateParticle :: Float -> Particle -> LineSegment
-interpolateParticle f (Particle b _) = transform b' particleLine where
+interpolateParticle f (Particle b _ ln) = transform b' ln where
     b' = interpolatedBody f b
 
 initParticleSystem :: ParticleSystem
 initParticleSystem = ParticleSystem []
 
 initParticle :: NewParticle -> RandomParticle
-initParticle (NewParticle p r d spr spd lt) = do
+initParticle (NewParticle p r d spr spd lt sz) = do
     e <- randomElliptical (0, r) (0, r)
     a <- randomBracket spr
     v <- randomBetween spd
     l <- randomBetween lt
     n <- randomAngle
     r <- randomBracket 10
+    s <- randomBetween sz
     return Particle
         { particleBody = initBody (p /+/ e) n (polar v (a+d)) r
         , particleLife = l
+        , particleLine = mkParticleLine s
         }
 
 tickParticles :: ParticleSystem -> ParticleSystem
 tickParticles (ParticleSystem ps) = ParticleSystem $ foldr go [] ps where
-    go (Particle body life) acc
+    go (Particle body life ln) acc
         | life == 0 = acc
-        | otherwise = Particle (updateBody body) (life-1) : acc
+        | otherwise = Particle (updateBody body) (life-1) ln : acc
 
 
 addParticle :: NewParticle -> ParticleGen ()

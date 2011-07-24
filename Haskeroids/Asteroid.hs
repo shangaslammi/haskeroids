@@ -107,6 +107,7 @@ explosionParticles (Asteroid sz b _ _) = addParticles n NewParticle
     , npSpread    = 2*pi
     , npSpeed     = (3.0, 6.0)
     , npLifeTime  = (15, 40)
+    , npSize      = (1,3)
     } where
         n = round $ radius sz
 

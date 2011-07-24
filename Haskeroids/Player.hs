@@ -89,6 +89,7 @@ tickPlayer kb p@(Player body alive _ rof)
             , npSpread    = pi/6.0
             , npSpeed     = (1.0, 4.0)
             , npLifeTime  = (5, 15)
+            , npSize      = (1,1)
             }
 
 -- | Test collision between the player ship and a list of Colliders

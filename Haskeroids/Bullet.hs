@@ -55,6 +55,7 @@ instance Collider Bullet where
             , npSpread    = pi/2
             , npSpeed     = (2.0, 5.0)
             , npLifeTime  = (5, 15)
+            , npSize      = (1,2)
             }
 
 -- | Initialize a new bullet with the given position and direction
