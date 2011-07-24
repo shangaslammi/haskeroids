@@ -17,35 +17,45 @@ polar m a = (m * sin a, m * (-cos a))
 
 -- | Transform a list of points into a list of connected line segments
 pointsToSegments :: [Vec2] -> [LineSegment]
-pointsToSegments (p:p':[])     = [LineSegment (p,p')]
+pointsToSegments (p:p':[])    = [LineSegment (p,p')]
 pointsToSegments (p:t@(p':_)) = LineSegment (p,p') : pointsToSegments t
 
 -- | Give a delta vector that needs to be added to point to wrap it around the
 --   screen edge.
 wrapper :: Vec2 -> Vec2
-wrapper (x,y) = (x',y')
-    where x' | x < 0 = 800
-             | x >= 800 = -800
-             | otherwise = 0
-          y' | y < 0 = 600
-             | y >= 600 = -600
-             | otherwise = 0
+wrapper (x,y) = (x',y') where
+    x'
+        | x < 0     =  800
+        | x >= 800  = -800
+        | otherwise =  0
 
+    y'
+        | y < 0     =  600
+        | y >= 600  = -600
+        | otherwise =  0
 
 ptDistanceSqr :: Vec2 -> Vec2 -> VecVal
-ptDistanceSqr (x,y) (x',y') = dx*dx + dy*dy
-    where dx = x-x'
-          dy = y-y'
+ptDistanceSqr (x,y) (x',y') = dx*dx + dy*dy where
+    dx = x - x'
+    dy = y - y'
 
--- | Add or subtract two vectors
+-- | Add two vectors
+(/+/) :: Vec2 -> Vec2 -> Vec2
 (x,y) /+/ (x',y') = (x+x', y+y')
+
+-- | Subtract two vectors
+(/-/) :: Vec2 -> Vec2 -> Vec2
 (x,y) /-/ (x',y') = (x-x', y-y')
 
 infixl 6 /+/
 infixl 6 /-/
 
 -- | Multiply a vector with a scalar
+(*/) :: VecVal -> Vec2 -> Vec2
 s */ (x,y) = (s*x, s*y)
+
+-- | Multiply a vector with a scalar
+(/*) :: Vec2 -> VecVal -> Vec2
 (x,y) /* s = (s*x, s*y)
 
 infixl 7 /*
