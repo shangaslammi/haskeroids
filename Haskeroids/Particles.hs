@@ -74,6 +74,9 @@ tickParticles (ParticleSystem ps) = ParticleSystem $ foldr go [] ps where
 addParticle :: NewParticle -> ParticleGen ()
 addParticle = tell . return
 
+addParticles :: Int -> NewParticle -> ParticleGen ()
+addParticles n = tell . replicate n
+
 runParticleGen :: ParticleGen a -> (a, [NewParticle])
 runParticleGen = runWriter
 
