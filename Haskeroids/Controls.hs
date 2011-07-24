@@ -1,8 +1,8 @@
-module Haskeroids.Controls (
-    turnRight,
-    turnLeft,
-    thrust,
-    shoot,
+module Haskeroids.Controls
+    ( turnRight
+    , turnLeft
+    , thrust
+    , shoot
     ) where
 
 import Graphics.UI.GLUT (Key(..), SpecialKey(..))
