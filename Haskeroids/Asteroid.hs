@@ -14,6 +14,7 @@ import Haskeroids.Geometry.Body
 import Haskeroids.Render
 import Haskeroids.Collision
 import Haskeroids.Random
+import Haskeroids.Particles
 
 import Data.List (replicate, sort)
 
@@ -81,16 +82,17 @@ collideAsteroid cs a = foldr go ([], a) cs where
 
 -- | Collide a list of asteroids against a list of other colliders
 --   Returns the remaining colliders and damaged asteroids.
-collideAsteroids :: Collider c => [c] -> [Asteroid] -> ([c], [Asteroid])
-collideAsteroids cs = foldr go (cs,[]) where
+collideAsteroids :: Collider c =>
+    [c] -> [Asteroid] -> ParticleGen ([c], [Asteroid])
+collideAsteroids cs = return . foldr go (cs,[]) where
     go a (cs,as) = (cs', a':as) where
         (cs',a') = collideAsteroid cs a
 
 -- | Spawn random asteroids
-spawnNewAsteroids :: Asteroid -> [RandomAsteroid]
+spawnNewAsteroids :: Asteroid -> ParticleGen [RandomAsteroid]
 spawnNewAsteroids (Asteroid sz b _ _)
-    | sz == Small = []
-    | otherwise   = replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
+    | sz == Small = return []
+    | otherwise   = return $ replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
 
 randomAsteroid :: Size -> Vec2 -> RandomAsteroid
 randomAsteroid sz pos = do

@@ -24,12 +24,12 @@ data Particle = Particle
     }
 
 data NewParticle = NewParticle
-    { position  :: Vec2
-    , radius    :: Float
-    , direction :: Float
-    , spread    :: Float
-    , speed     :: SpeedRange
-    , lifeTime  :: LifeRange
+    { npPosition  :: Vec2
+    , npRadius    :: Float
+    , npDirection :: Float
+    , npSpread    :: Float
+    , npSpeed     :: SpeedRange
+    , npLifeTime  :: LifeRange
     }
 
 type RandomParticle = IO Particle

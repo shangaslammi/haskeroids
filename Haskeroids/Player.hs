@@ -13,6 +13,7 @@ import Haskeroids.Controls
 import Haskeroids.Asteroid
 import Haskeroids.Collision
 import Haskeroids.Bullet
+import Haskeroids.Particles
 
 import Data.Maybe (isJust)
 import Control.Arrow ((***))
@@ -49,10 +50,10 @@ instance Collider Player where
     collisionLines  = interpolatedLines 0
 
 -- | Handle keyboard input and update the player ship
-tickPlayer :: Keyboard -> Player -> Player
+tickPlayer :: Keyboard -> Player -> ParticleGen Player
 tickPlayer kb p@(Player body alive _ rof)
-    | not alive = p { playerBullet = Nothing }
-    | otherwise = Player body' True bullet rof' where
+    | not alive = return $ p { playerBullet = Nothing }
+    | otherwise = return $ Player body' True bullet rof' where
 
         body'   = updatePlayerBody turn acc body
 
@@ -78,10 +79,10 @@ tickPlayer kb p@(Player body alive _ rof)
 
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
-collidePlayer :: Collider a => [a] -> Player -> Player
-collidePlayer _  p@(Player _ False _ _) = p
-collidePlayer [] p = p
-collidePlayer a  p = p { playerAlive = not $ any (collides p) a }
+collidePlayer :: Collider a => [a] -> Player -> ParticleGen Player
+collidePlayer _  p@(Player _ False _ _) = return p
+collidePlayer [] p = return p
+collidePlayer a  p = return $ p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player

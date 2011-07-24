@@ -54,18 +54,22 @@ tickStateIO kb s = do
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> ParticleGen GameState
-tickState kb s@(GameState pl a b p _) = return s
-    { statePlayer    = collidePlayer a' p'
-    , stateAsteroids = aa
-    , stateBullets   = b''
-    , stateParticles = p
-    , newAsteroids   = concatMap spawnNewAsteroids ad
-    } where
-        (b'', a'') = collideAsteroids b' a'
-        (aa, ad)   = partition asteroidAlive a''
+tickState kb s@(GameState pl a b p _) = do
+    let a' = map updateAsteroid a
+    pl' <- tickPlayer kb pl >>= collidePlayer a'
 
-        p' = tickPlayer kb pl
-        a' = map updateAsteroid a
-        b' = filter bulletActive . map updateBullet $ case playerBullet p' of
+    let b' = filter bulletActive . map updateBullet $ case playerBullet pl' of
                 Nothing -> b
                 Just x  -> x:b
+    (b'', a'') <- collideAsteroids b' a'
+
+    let (aa, ad) = partition asteroidAlive a''
+    na <- mapM spawnNewAsteroids ad
+
+    return s
+      { statePlayer    = pl'
+      , stateAsteroids = aa
+      , stateBullets   = b''
+      , stateParticles = p
+      , newAsteroids   = concat na
+      }
