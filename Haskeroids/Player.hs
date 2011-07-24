@@ -17,6 +17,7 @@ import Haskeroids.Particles
 
 import Data.Maybe (isJust)
 import Control.Arrow ((***))
+import Control.Monad (when)
 
 -- | Data type for tracking current player state
 data Player = Player
@@ -53,9 +54,11 @@ instance Collider Player where
 tickPlayer :: Keyboard -> Player -> ParticleGen Player
 tickPlayer kb p@(Player body alive _ rof)
     | not alive = return $ p { playerBullet = Nothing }
-    | otherwise = return $ Player body' True bullet rof' where
+    | otherwise = do
+        when (acc > 0) emitEngineParticles
+        return $ Player body' True bullet rof' where
 
-        body'   = updatePlayerBody turn acc body
+        body' = updatePlayerBody turn acc body
 
         turn
             | key turnLeft  = -0.18
@@ -76,6 +79,10 @@ tickPlayer kb p@(Player body alive _ rof)
 
         newBullet = initBullet (bodyPos body) (bodyAngle body)
         key       = isKeyDown kb
+
+
+emitEngineParticles :: ParticleGen ()
+emitEngineParticles = undefined
 
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
