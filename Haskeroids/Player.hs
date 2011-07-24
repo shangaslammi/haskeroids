@@ -40,14 +40,14 @@ shipDamping = 0.96
 
 instance LineRenderable Player where
     interpolatedLines f (Player body alive _ _)
-        | alive == False = []
-        | otherwise      = map (transform b') shipLines where
+        | not alive = []
+        | otherwise = map (transform b') shipLines where
             b' = interpolatedBody f body
 
 instance Tickable Player where
     tick kb  p@(Player body alive _ rof)
-        | alive == False = p { playerBullet = Nothing }
-        | otherwise      = Player body' True bullet rof' where
+        | not alive = p { playerBullet = Nothing }
+        | otherwise = Player body' True bullet rof' where
 
             body'   = updatePlayerBody turn acc body
 
@@ -66,7 +66,7 @@ instance Tickable Player where
 
             rof'
                 | isJust bullet = fireDelay
-                | otherwise     = if rof > 0 then (rof-1) else 0
+                | otherwise     = if rof > 0 then rof - 1 else 0
 
             newBullet = initBullet (bodyPos body) (bodyAngle body)
             key       = isKeyDown kb
