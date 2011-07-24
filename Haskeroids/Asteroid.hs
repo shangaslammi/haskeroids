@@ -17,6 +17,7 @@ import Haskeroids.Random
 import Haskeroids.Particles
 
 import Data.List (replicate, sort)
+import Data.Foldable (foldrM)
 
 type Hitpoints = Int
 data Size = Small|Medium|Large deriving (Ord, Eq, Enum)
@@ -74,8 +75,8 @@ asteroidAlive = (0<).asteroidHits
 
 -- | Collide an asteroid against multiple colliders and return a new modified
 --   asteroid and a list of remaining colliders.
-collideAsteroid :: Collider c => [c] -> Asteroid -> ([c], Asteroid)
-collideAsteroid cs a = foldr go ([], a) cs where
+collideAsteroid :: Collider c => [c] -> Asteroid -> ParticleGen ([c], Asteroid)
+collideAsteroid cs a = return $ foldr go ([], a) cs where
     go c (cs, a)
         | collides c a = (cs, damageAsteroid a)
         | otherwise    = (c:cs, a)
@@ -84,9 +85,11 @@ collideAsteroid cs a = foldr go ([], a) cs where
 --   Returns the remaining colliders and damaged asteroids.
 collideAsteroids :: Collider c =>
     [c] -> [Asteroid] -> ParticleGen ([c], [Asteroid])
-collideAsteroids cs = return . foldr go (cs,[]) where
-    go a (cs,as) = (cs', a':as) where
-        (cs',a') = collideAsteroid cs a
+collideAsteroids cs = foldrM go (cs,[]) where
+    go a (cs,as) = do
+        (cs',a') <- collideAsteroid cs a
+        return (cs', a':as)
+
 
 -- | Spawn random asteroids
 spawnNewAsteroids :: Asteroid -> ParticleGen [RandomAsteroid]
