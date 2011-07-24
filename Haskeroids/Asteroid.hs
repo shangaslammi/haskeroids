@@ -1,36 +1,36 @@
-module Haskeroids.Asteroid (
-    Asteroid,
-    RandomAsteroid,
-    Size(..),
-    genInitialAsteroid,
-    updateAsteroid,
-    spawnNewAsteroids,
-    collideAsteroids,
-    asteroidAlive
+module Haskeroids.Asteroid
+    ( Asteroid
+    , RandomAsteroid
+    , Size(..)
+    , genInitialAsteroid
+    , updateAsteroid
+    , spawnNewAsteroids
+    , collideAsteroids
+    , asteroidAlive
     ) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 import Haskeroids.Render
 import Haskeroids.Collision
+import Haskeroids.Random
 
 import Data.List (replicate, sort)
-import Control.Monad (replicateM)
-import System.Random (randomRIO)
 
 type Hitpoints = Int
 data Size = Small|Medium|Large deriving (Ord, Eq, Enum)
-data Asteroid = Asteroid {
-    asteroidSize  :: Size,
-    asteroidBody  :: Body,
-    asteroidHits  :: Hitpoints,
-    asteroidLines :: [LineSegment] }
+data Asteroid = Asteroid
+    { asteroidSize  :: Size
+    , asteroidBody  :: Body
+    , asteroidHits  :: Hitpoints
+    , asteroidLines :: [LineSegment]
+    }
 
 type RandomAsteroid = IO Asteroid
 
 instance LineRenderable Asteroid where
-    interpolatedLines f (Asteroid sz b _ lns) = map (transform b') lns
-        where b' = interpolatedBody f b
+    interpolatedLines f (Asteroid sz b _ lns) = map (transform b') lns where
+        b' = interpolatedBody f b
 
 instance Collider Asteroid where
     collisionCenter = bodyPos . asteroidBody
@@ -74,17 +74,17 @@ asteroidAlive = (0<).asteroidHits
 -- | Collide an asteroid against multiple colliders and return a new modified
 --   asteroid and a list of remaining colliders.
 collideAsteroid :: Collider c => [c] -> Asteroid -> ([c], Asteroid)
-collideAsteroid cs a = foldr go ([], a) cs
-    where go c (cs, a) = if collides c a
-            then (cs, damageAsteroid a)
-            else (c:cs, a)
+collideAsteroid cs a = foldr go ([], a) cs where
+    go c (cs, a)
+        | collides c a = (cs, damageAsteroid a)
+        | otherwise    = (c:cs, a)
 
 -- | Collide a list of asteroids against a list of other colliders
 --   Returns the remaining colliders and damaged asteroids.
 collideAsteroids :: Collider c => [c] -> [Asteroid] -> ([c], [Asteroid])
-collideAsteroids cs = foldr go (cs,[])
-    where go a (cs,as) = (cs', a':as)
-            where (cs',a') = collideAsteroid cs a
+collideAsteroids cs = foldr go (cs,[]) where
+    go a (cs,as) = (cs', a':as) where
+        (cs',a') = collideAsteroid cs a
 
 -- | Spawn random asteroids
 spawnNewAsteroids :: Asteroid -> [RandomAsteroid]
@@ -94,33 +94,33 @@ spawnNewAsteroids (Asteroid sz b _ _)
 
 randomAsteroid :: Size -> Vec2 -> RandomAsteroid
 randomAsteroid sz pos = do
-    dx  <- randomRIO (-r*1.0, r*1.0)
-    dy  <- randomRIO (-r*1.0, r*1.0)
-    vx  <- randomRIO (-40.0/r, 40.0/r)
-    vy  <- randomRIO (-40.0/r, 40.0/r)
-    r   <- randomRIO (-3.0/r, 3.0/r)
-    lns <- genAsteroidLines sz
-    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) r lns
-    where r = radius sz
+    let r = radius sz
+
+    (dx,dy) <- randomPair r
+    (vx,vy) <- randomPair (40.0/r)
+    rot     <- randomBracket (3.0/r)
+    lns     <- genAsteroidLines sz
+
+    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) rot lns
+
 
 -- | Generate an initial asteroid in the level
 genInitialAsteroid :: RandomAsteroid
-genInitialAsteroid = do
-    ang  <- randomRIO (0, 2.0*pi)
-    xrad <- randomRIO (140, 400)
-    yrad <- randomRIO (140, 300)
-    let x = cos ang * xrad
-    let y = sin ang * yrad
-    randomAsteroid Large (x,y)
+genInitialAsteroid = randomElliptical xb yb >>= randomAsteroid Large where
+    xb = (140, 400)
+    yb = (140, 300)
 
 -- | Generate the line segments for an asteroid size
 genAsteroidLines :: Size -> IO [LineSegment]
 genAsteroidLines sz = do
-    radii  <- replicateM numPts $ randomRIO (rad*0.5, rad)
-    angvar <- replicateM numPts $ randomRIO (-0.01*pi, 0.01*pi)
-    let angles = sort $ zipWith (+) angvar [0.0,step..2.0*pi]
-    let points = zipWith polar radii angles
+    let numPts = numVertices sz
+        r      = radius sz
+
+    radii  <- nrandomR numPts (r*0.5, r)
+    angvar <- nrandomR numPts (-0.01*pi, 0.01*pi)
+
+    let step   = 2.0*pi/(fromIntegral numPts + 1)
+        angles = sort $ zipWith (+) angvar [0.0,step..2.0*pi]
+        points = zipWith polar radii angles
+
     return $ pointsToSegments $ points ++ [head points]
-    where numPts = numVertices sz
-          rad    = radius sz
-          step   = 2.0*pi/(fromIntegral numPts + 1)
