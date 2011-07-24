@@ -10,6 +10,7 @@ import Data.List (partition, replicate)
 import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
+import Haskeroids.Particles
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard (Keyboard)
 
@@ -18,11 +19,12 @@ data GameState = GameState
     { statePlayer    :: Player
     , stateAsteroids :: [Asteroid]
     , stateBullets   :: [Bullet]
+    , stateParticles :: ParticleSystem
     , newAsteroids   :: [RandomAsteroid]
     }
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a b _) = plines ++ alines ++ blines where
+    interpolatedLines f (GameState p a b _ _) = plines ++ alines ++ blines where
         plines = interpolatedLines f p
         alines = concatMap (interpolatedLines f) a
         blines = concatMap (interpolatedLines f) b
@@ -33,6 +35,7 @@ initialGameState = GameState
     { statePlayer    = initPlayer
     , stateAsteroids = []
     , stateBullets   = []
+    , stateParticles = initParticleSystem
     , newAsteroids   = replicate 3 genInitialAsteroid
     }
 
@@ -44,10 +47,11 @@ initNewAsteroids st = do
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
-tickState kb s@(GameState pl a b _) = s
+tickState kb s@(GameState pl a b p _) = s
     { statePlayer    = collidePlayer a' p'
     , stateAsteroids = aa
     , stateBullets   = b''
+    , stateParticles = p
     , newAsteroids   = concatMap spawnNewAsteroids ad
     } where
         (b'', a'') = collideAsteroids b' a'
