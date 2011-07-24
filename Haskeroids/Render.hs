@@ -20,27 +20,25 @@ renderLines lns = do
 
 -- | Generate extra lines for segments that go out of the screen
 wrapLines :: [LineSegment] -> [LineSegment]
-wrapLines = foldr go []
-    where go l@(LineSegment (p,p')) acc
-                | both      = l':l'':acc
-                | first     = l:l':acc
-                | second    = l:l'':acc
-                | otherwise = l:acc
-            where
-              both   = first && second && w/= w'
-              first  = w /= (0,0)
-              second = w' /= (0,0)
+wrapLines = foldr go [] where
+    go l@(LineSegment (p,p')) acc
+        | both      = l': l'' : acc
+        | first     = l : l'  : acc
+        | second    = l : l'' : acc
+        | otherwise = l : acc
+        where
+            both   = first && second && w/= w'
+            first  = w  /= (0,0)
+            second = w' /= (0,0)
 
-              w   = wrapper p
-              w'  = wrapper p'
-              l'  = applyXform (translatePt w) l
-              l'' = applyXform (translatePt w') l
+            w   = wrapper p
+            w'  = wrapper p'
+            l'  = applyXform (translatePt w)  l
+            l'' = applyXform (translatePt w') l
 
 -- | Generate the OpenGL vertices of a line segment
 lineVertices :: LineSegment -> IO ()
-lineVertices (LineSegment (p,p')) = do
-    ptVertex p
-    ptVertex p'
+lineVertices (LineSegment (p,p')) = ptVertex p >> ptVertex p'
 
 -- | Generate an OpenGL vertex from a point
 ptVertex :: Vec2 -> IO ()
