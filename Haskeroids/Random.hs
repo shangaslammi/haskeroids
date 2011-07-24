@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Haskeroids.Random
     ( randomBracket
     , randomBetween
@@ -7,27 +8,34 @@ module Haskeroids.Random
     , nrandomR
     ) where
 
-import System.Random (Random, randomRIO)
+import qualified System.Random as R
 import Control.Monad (liftM2, replicateM)
+import Control.Monad.State
 
-randomBetween :: Random a => (a,a) -> IO a
-randomBetween = randomRIO
+newtype Random a = Random { runR :: State (R.StdGen) a} deriving Monad
 
-randomBracket :: (Num a, Random a) => a -> IO a
-randomBracket a = randomRIO (-a, a)
+randomBetween :: R.Random a => (a,a) -> Random a
+randomBetween b = Random $ do
+    g <- get
+    let (a, g') = R.randomR b g
+    put g'
+    return a
 
-randomPair :: (Num a, Random a) => a -> IO (a,a)
+randomBracket :: (Num a, R.Random a) => a -> Random a
+randomBracket a = randomBetween (-a, a)
+
+randomPair :: (Num a, R.Random a) => a -> Random (a,a)
 randomPair a = liftM2 (,) (randomBracket a) (randomBracket a)
 
-randomAngle :: (Random a, Floating a) => IO a
-randomAngle = randomRIO (0, pi * 2.0)
+randomAngle :: (R.Random a, Floating a) => Random a
+randomAngle = randomBetween (0, pi * 2.0)
 
-randomElliptical :: (Random a, Floating a) => (a,a) -> (a,a) -> IO (a, a)
+randomElliptical :: (R.Random a, Floating a) => (a,a) -> (a,a) -> Random (a, a)
 randomElliptical xb yb = do
     ang  <- randomAngle
-    xrad <- randomRIO xb
-    yrad <- randomRIO yb
+    xrad <- randomBetween xb
+    yrad <- randomBetween yb
     return (cos ang * xrad, sin ang * yrad)
 
-nrandomR :: Random a => Int -> (a,a) -> IO [a]
-nrandomR n = replicateM n . randomRIO
+nrandomR :: R.Random a => Int -> (a,a) -> Random [a]
+nrandomR n = replicateM n . randomBetween
