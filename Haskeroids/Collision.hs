@@ -3,6 +3,7 @@ module Haskeroids.Collision (Collider(..)) where
 import Control.Applicative
 
 import Haskeroids.Geometry
+import Haskeroids.Particles
 
 class Collider c where
     -- | Line segments used for collision detection
@@ -23,6 +24,9 @@ class Collider c where
 
         cl  = collisionLines c
         cl' = collisionLines c'
+
+    collisionParticles :: c -> ParticleGen ()
+    collisionParticles = return . const ()
 
 -- | Test if two line segments intersect
 lineCollision :: LineSegment -> LineSegment -> Bool

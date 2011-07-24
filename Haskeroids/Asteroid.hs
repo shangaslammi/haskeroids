@@ -76,10 +76,10 @@ asteroidAlive = (0<).asteroidHits
 -- | Collide an asteroid against multiple colliders and return a new modified
 --   asteroid and a list of remaining colliders.
 collideAsteroid :: Collider c => [c] -> Asteroid -> ParticleGen ([c], Asteroid)
-collideAsteroid cs a = return $ foldr go ([], a) cs where
+collideAsteroid cs a = foldrM go ([], a) cs where
     go c (cs, a)
-        | collides c a = (cs, damageAsteroid a)
-        | otherwise    = (c:cs, a)
+        | collides c a = collisionParticles c >> return (cs, damageAsteroid a)
+        | otherwise    = return (c:cs, a)
 
 -- | Collide a list of asteroids against a list of other colliders
 --   Returns the remaining colliders and damaged asteroids.
