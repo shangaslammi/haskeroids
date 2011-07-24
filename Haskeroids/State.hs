@@ -2,6 +2,7 @@ module Haskeroids.State
     ( GameState(..)
     , initialGameState
     , initNewAsteroids
+    , tickState
     ) where
 
 import Data.List (partition, replicate)
@@ -10,7 +11,6 @@ import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
 import Haskeroids.Render (LineRenderable(..))
-import Haskeroids.Tick
 import Haskeroids.Keyboard (Keyboard)
 
 -- | Data type for tracking game state
@@ -26,9 +26,6 @@ instance LineRenderable GameState where
         plines = interpolatedLines f p
         alines = concatMap (interpolatedLines f) a
         blines = concatMap (interpolatedLines f) b
-
-instance Tickable GameState where
-    tick = tickState
 
 -- | Generate the initial game state
 initialGameState :: GameState
@@ -56,7 +53,7 @@ tickState kb s@(GameState pl a b _) = s
         (b'', a'') = collideAsteroids b' a'
         (aa, ad)   = partition asteroidAlive a''
 
-        p' = tick kb pl
+        p' = tickPlayer kb pl
         a' = map updateAsteroid a
         b' = filter bulletActive . map updateBullet $ case playerBullet p' of
                 Nothing -> b

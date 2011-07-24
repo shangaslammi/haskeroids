@@ -2,13 +2,13 @@ module Haskeroids.Player
     ( Player(..)
     , initPlayer
     , collidePlayer
+    , tickPlayer
     ) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 import Haskeroids.Render (LineRenderable(..))
-import Haskeroids.Tick
-import Haskeroids.Keyboard (isKeyDown)
+import Haskeroids.Keyboard (Keyboard, isKeyDown)
 import Haskeroids.Controls
 import Haskeroids.Asteroid
 import Haskeroids.Collision
@@ -37,45 +37,44 @@ fireDelay = 5
 shipDamping :: Float
 shipDamping = 0.96
 
-
 instance LineRenderable Player where
     interpolatedLines f (Player body alive _ _)
         | not alive = []
         | otherwise = map (transform b') shipLines where
             b' = interpolatedBody f body
 
-instance Tickable Player where
-    tick kb  p@(Player body alive _ rof)
-        | not alive = p { playerBullet = Nothing }
-        | otherwise = Player body' True bullet rof' where
-
-            body'   = updatePlayerBody turn acc body
-
-            turn
-                | key turnLeft  = -0.18
-                | key turnRight =  0.18
-                | otherwise     =  0
-
-            acc
-                | key thrust = 0.7
-                | otherwise  = 0
-
-            bullet
-                | rof == 0 && key shoot = Just newBullet
-                | otherwise             = Nothing
-
-            rof'
-                | isJust bullet = fireDelay
-                | otherwise     = if rof > 0 then rof - 1 else 0
-
-            newBullet = initBullet (bodyPos body) (bodyAngle body)
-            key       = isKeyDown kb
-
-
 instance Collider Player where
     collisionCenter = bodyPos . playerBody
     collisionRadius = const shipSize
     collisionLines  = interpolatedLines 0
+
+-- | Handle keyboard input and update the player ship
+tickPlayer :: Keyboard -> Player -> Player
+tickPlayer kb p@(Player body alive _ rof)
+    | not alive = p { playerBullet = Nothing }
+    | otherwise = Player body' True bullet rof' where
+
+        body'   = updatePlayerBody turn acc body
+
+        turn
+            | key turnLeft  = -0.18
+            | key turnRight =  0.18
+            | otherwise     =  0
+
+        acc
+            | key thrust = 0.7
+            | otherwise  = 0
+
+        bullet
+            | rof == 0 && key shoot = Just newBullet
+            | otherwise             = Nothing
+
+        rof'
+            | isJust bullet = fireDelay
+            | otherwise     = if rof > 0 then rof - 1 else 0
+
+        newBullet = initBullet (bodyPos body) (bodyAngle body)
+        key       = isKeyDown kb
 
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
