@@ -1,7 +1,8 @@
-module Haskeroids.Player (
-    Player(..),
-    initPlayer,
-    collidePlayer) where
+module Haskeroids.Player
+    ( Player(..)
+    , initPlayer
+    , collidePlayer
+    ) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
@@ -13,42 +14,63 @@ import Haskeroids.Asteroid
 import Haskeroids.Collision
 import Haskeroids.Bullet
 
+import Data.Maybe (isJust)
+import Control.Arrow ((***))
+
 -- | Data type for tracking current player state
-data Player = Player {
-    playerBody   :: Body,
-    playerAlive  :: Bool,
-    playerBullet :: Maybe Bullet,
-    playerROF    :: Int
+data Player = Player
+    { playerBody   :: Body
+    , playerAlive  :: Bool
+    , playerBullet :: Maybe Bullet
+    , playerROF    :: Int
     }
 
+-- | Constant for the ship size
+shipSize :: Float
+shipSize = 12.0
+
+-- | Constant for the delay (in ticks) between firing bullets
+fireDelay :: Int
+fireDelay = 5
+
+-- | Damping factor for ship velocity
+shipDamping :: Float
+shipDamping = 0.96
+
+
 instance LineRenderable Player where
-    interpolatedLines _ (Player _ False _ _) = []
-    interpolatedLines f (Player b _ _ _) = map (transform b') shipLines
-        where b' = interpolatedBody f b
+    interpolatedLines f (Player body alive _ _)
+        | alive == False = []
+        | otherwise      = map (transform b') shipLines where
+            b' = interpolatedBody f body
 
 instance Tickable Player where
-    tick _  p@(Player _ False _ _) = p { playerBullet = Nothing }
-    tick kb p@(Player b _ _ rof) = p {
-            playerBody   = updatePlayerBody turn acc b,
-            playerBullet = bullet,
-            playerROF    = rof' }
-        where turn | key turnLeft  = -0.18
-                   | key turnRight = 0.18
-                   | otherwise     = 0
+    tick kb  p@(Player body alive _ rof)
+        | alive == False = p { playerBullet = Nothing }
+        | otherwise      = Player body' True bullet rof' where
 
-              acc | key thrust = 0.7
-                  | otherwise  = 0
+            body'   = updatePlayerBody turn acc body
 
-              bullet | rof == 0 && key shoot = Just $ initBullet (bodyPos b) (bodyAngle b)
-                     | otherwise = Nothing
+            turn
+                | key turnLeft  = -0.18
+                | key turnRight =  0.18
+                | otherwise     =  0
 
-              key = isKeyDown kb
+            acc
+                | key thrust = 0.7
+                | otherwise  = 0
 
-              rof' = case bullet of
-                        Nothing -> if rof > 0
-                            then rof - 1
-                            else 0
-                        _       -> fireDelay
+            bullet
+                | rof == 0 && key shoot = Just newBullet
+                | otherwise             = Nothing
+
+            rof'
+                | isJust bullet = fireDelay
+                | otherwise     = if rof > 0 then (rof-1) else 0
+
+            newBullet = initBullet (bodyPos body) (bodyAngle body)
+            key       = isKeyDown kb
+
 
 instance Collider Player where
     collisionCenter = bodyPos . playerBody
@@ -58,9 +80,9 @@ instance Collider Player where
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
 collidePlayer :: Collider a => [a] -> Player -> Player
-collidePlayer _ p@(Player _ False _ _) = p
+collidePlayer _  p@(Player _ False _ _) = p
 collidePlayer [] p = p
-collidePlayer a p = p { playerAlive = not $ any (collides p) a }
+collidePlayer a  p = p { playerAlive = not $ any (collides p) a }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
@@ -68,21 +90,20 @@ initPlayer = Player (initBody (400,300) 0) True Nothing 0
 
 -- | Update the player ship with the given turn rate and acceleration
 updatePlayerBody :: Float -> Float -> Body -> Body
-updatePlayerBody turn acc = updateBody . damping 0.96 . accForward acc . rotate turn
-
--- | Constant for the ship size
-shipSize = 12.0 :: Float
-
--- | Constant for the delay (in ticks) between firing bullets
-fireDelay = 5
+updatePlayerBody turn acc =
+    updateBody . damping shipDamping . accForward acc . rotate turn
 
 -- | List of lines that make up the ship hull
 shipLines :: [LineSegment]
 shipLines = pointsToSegments shipPoints
 
 shipPoints :: [Vec2]
-shipPoints = [polar shipSize      0,
-              polar shipSize      (0.7*pi),
-              polar (shipSize*0.2) pi,
-              polar shipSize      (1.3*pi),
-              polar shipSize      0]
+shipPoints = map (uncurry polar . multiply) points where
+    multiply = (shipSize*) *** (pi*)
+    points   =
+       [ (1.0, 0.0)
+       , (1.0, 0.7)
+       , (0.2, 1.0)
+       , (1.0, 1.3)
+       , (1.0, 0.0)
+       ]
