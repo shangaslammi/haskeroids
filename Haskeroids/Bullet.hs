@@ -8,6 +8,7 @@ module Haskeroids.Bullet
 
 import Haskeroids.Render
 import Haskeroids.Collision
+import Haskeroids.Particles
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 
@@ -42,6 +43,19 @@ instance Collider Bullet where
     collisionCenter  = bodyPos . bulletBody
     collisionRadius  = const bulletSpeed
     collisionLines b = return $ transform (bulletBody b) bulletLine'
+
+    collisionParticles b = do
+        let body    = bulletBody b
+            emitDir = bodyAngle body + pi
+
+        addParticles 5 NewParticle
+            { npPosition  = bodyPos body
+            , npRadius    = 3
+            , npDirection = emitDir
+            , npSpread    = pi/2
+            , npSpeed     = (2.0, 5.0)
+            , npLifeTime  = (5, 15)
+            }
 
 -- | Initialize a new bullet with the given position and direction
 initBullet :: Vec2 -> Float -> Bullet
