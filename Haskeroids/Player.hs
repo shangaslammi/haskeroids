@@ -92,12 +92,28 @@ tickPlayer kb p@(Player body alive _ rof)
             , npSize      = (1,1)
             }
 
+
+explosionParticles :: Player -> ParticleGen ()
+explosionParticles p = addParticles 40 NewParticle
+    { npPosition  = bodyPos b
+    , npRadius    = shipSize / 2.0
+    , npDirection = 0
+    , npSpread    = 2*pi
+    , npSpeed     = (2.0, 8.0)
+    , npLifeTime  = (15, 50)
+    , npSize      = (2,4)
+    } where
+        b = playerBody p
+
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed
 collidePlayer :: Collider a => [a] -> Player -> ParticleGen Player
 collidePlayer _  p@(Player _ False _ _) = return p
 collidePlayer [] p = return p
-collidePlayer a  p = return $ p { playerAlive = not $ any (collides p) a }
+collidePlayer a  p = do
+    let collision = any (collides p) a
+    when collision $ explosionParticles p
+    return $ p { playerAlive = not collision }
 
 -- | Initial state for the player ship at center of the screen
 initPlayer :: Player
