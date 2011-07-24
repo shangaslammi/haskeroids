@@ -80,9 +80,14 @@ tickPlayer kb p@(Player body alive _ rof)
         newBullet = initBullet (bodyPos body) (bodyAngle body)
         key       = isKeyDown kb
 
-
-emitEngineParticles :: ParticleGen ()
-emitEngineParticles = undefined
+        emitEngineParticles = addParticles 3 $ NewParticle
+            { npPosition  = bodyPos body'
+            , npRadius    = 0
+            , npDirection = -(bodyAngle body')
+            , npSpread    = pi/4.0
+            , npSpeed     = (1.0, 3.0)
+            , npLifeTime  = (20, 50)
+            }
 
 -- | Test collision between the player ship and a list of Colliders
 --   If the ship intersects with any, it is destroyed

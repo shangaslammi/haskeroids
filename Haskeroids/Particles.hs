@@ -5,6 +5,7 @@ module Haskeroids.Particles
     , initParticleSystem
     , initNewParticles
     , addParticle
+    , addParticles
     , runParticleGen
     ) where
 
