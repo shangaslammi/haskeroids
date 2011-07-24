@@ -1,28 +1,28 @@
-module Haskeroids.Geometry.Body (
-    Body (..),
-    transform,
-    transformPt,
-    rotate,
-    damping,
-    accForward,
-    updateBody,
-    initBody,
-    interpolatedBody,
+module Haskeroids.Geometry.Body
+    ( Body (..)
+    , transform
+    , transformPt
+    , rotate
+    , damping
+    , accForward
+    , updateBody
+    , initBody
+    , interpolatedBody
     ) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Transform
 
 -- | Data type that contains the position and orientation of a rigid body
-data Body = Body {
-    bodyPos   :: Vec2,
-    bodyAngle :: Float,
+data Body = Body
+    { bodyPos      :: Vec2
+    , bodyAngle    :: Float
 
-    bodyVelocity :: Vec2,
-    bodyRotation :: Float,
+    , bodyVelocity :: Vec2
+    , bodyRotation :: Float
 
-    prevPos   :: Vec2,
-    prevAngle :: Float
+    , prevPos      :: Vec2
+    , prevAngle    :: Float
     }
 
 -- | Initialize a new rigid body in the given location
@@ -32,31 +32,31 @@ initBody pos angle = Body pos angle (0,0) 0 pos angle
 -- | Update the position and orientation of a body according to its current
 --   velocity and rotation.
 updateBody :: Body -> Body
-updateBody b = b {
-    bodyPos = pos' /+/ wrap,  bodyAngle = a',
-    prevPos = pos  /+/ wrap,  prevAngle = a }
-
-    where a    = bodyAngle b
-          pos  = bodyPos b
-          pos' = pos /+/ bodyVelocity b
-          a'   = a + bodyRotation b
-          wrap = wrapper pos'
+updateBody b = b
+    { bodyPos = pos' /+/ wrap,  bodyAngle = a'
+    , prevPos = pos  /+/ wrap,  prevAngle = a
+    } where
+        a    = bodyAngle b
+        pos  = bodyPos b
+        pos' = pos /+/ bodyVelocity b
+        a'   = a + bodyRotation b
+        wrap = wrapper pos'
 
 -- | Generate body data is is between current and previous state.
 interpolatedBody :: Float -- ^ interpolation point
                  -> Body  -- ^ body
                  -> Body  -- ^ interpolated body
 
-interpolatedBody i b = b { bodyPos = pos', bodyAngle = a' }
-    where pos' = bodyPos b /* i /+/ prevPos b /* i'
-          a'   = bodyAngle b * i + prevAngle b * i'
-          i'   = 1.0 - i
+interpolatedBody i b = b { bodyPos = pos', bodyAngle = a' } where
+    pos' = bodyPos b /* i /+/ prevPos b /* i'
+    a'   = bodyAngle b * i + prevAngle b * i'
+    i'   = 1.0 - i
 
 -- | Accelerate a rigid body with the given vector
 accelerate :: Vec2 -> Body -> Body
-accelerate (ax,ay) b = b { bodyVelocity = newVelocity }
-    where newVelocity = (ax+vx, ay+vy)
-          (vx,vy)     = bodyVelocity b
+accelerate (ax,ay) b = b { bodyVelocity = newVelocity } where
+    newVelocity = (ax+vx, ay+vy)
+    (vx,vy)     = bodyVelocity b
 
 -- | Accelerate a rigid body in the direction of its current angle with the
 --   given magnitude.
