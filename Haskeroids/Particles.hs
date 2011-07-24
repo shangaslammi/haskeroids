@@ -1,13 +1,17 @@
 module Haskeroids.Particles
     ( ParticleSystem
     , NewParticle(..)
+    , ParticleGen
     , initParticleSystem
+    , initNewParticles
     ) where
 
 import Haskeroids.Render
 import Haskeroids.Random
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
+
+import Control.Monad.Writer
 
 particleLine :: LineSegment
 particleLine = LineSegment ((0,1),(0,-1))
@@ -31,6 +35,7 @@ type Direction      = Float
 type Spread         = Float
 type SpeedRange     = (Float, Float)
 type LifeRange      = (Int, Int)
+type ParticleGen    = Writer [NewParticle]
 
 newtype ParticleSystem = ParticleSystem [Particle]
 
@@ -56,6 +61,9 @@ initParticle (NewParticle p r d spr spd lt) = do
         { particleBody = initBody (p /+/ e) n (polar v (a+d)) r
         , particleLife = l
         }
+
+addParticle :: NewParticle -> ParticleGen ()
+addParticle = tell . return
 
 initNewParticles :: [NewParticle] -> ParticleSystem -> IO ParticleSystem
 initNewParticles nps (ParticleSystem ps) = do
