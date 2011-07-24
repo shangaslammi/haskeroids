@@ -18,8 +18,8 @@ initKeyboard = Keyboard Set.empty
 
 -- | Record a key state change in the given Keyboard
 handleKeyEvent :: Key -> KeyState -> Keyboard -> Keyboard
-handleKeyEvent k Up   = addKey k
-handleKeyEvent k Down = removeKey k
+handleKeyEvent k Down = addKey k
+handleKeyEvent k Up   = removeKey k
 
 addKey :: Key -> Keyboard -> Keyboard
 addKey k (Keyboard s) = Keyboard $ Set.insert k s
