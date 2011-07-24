@@ -7,6 +7,7 @@ module Haskeroids.Particles
     , addParticle
     , addParticles
     , runParticleGen
+    , tickParticles
     ) where
 
 import Haskeroids.Render

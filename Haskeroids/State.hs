@@ -71,6 +71,6 @@ tickState kb s@(GameState pl a b p _) = do
       { statePlayer    = pl'
       , stateAsteroids = aa
       , stateBullets   = b''
-      , stateParticles = p
+      , stateParticles = tickParticles p
       , newAsteroids   = concat na
       }
