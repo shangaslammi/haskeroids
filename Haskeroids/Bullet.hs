@@ -2,8 +2,7 @@
 module Haskeroids.Bullet
     ( Bullet
     , initBullet
-    , updateBullet
-    , bulletActive
+    , updateBullets
     ) where
 
 import Haskeroids.Render
@@ -68,6 +67,10 @@ initBullet pos angle = Bullet bulletMaxLife body where
 -- | Update a bullet to a new position
 updateBullet :: Bullet -> Bullet
 updateBullet (Bullet l b) = Bullet (l-1) $ updateBody b
+
+-- | Update a list of bullets
+updateBullets :: [Bullet] -> [Bullet]
+updateBullets = filter bulletActive . map updateBullet
 
 -- | Test wether a bullet is still active
 bulletActive :: Bullet -> Bool

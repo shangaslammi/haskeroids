@@ -47,12 +47,12 @@ renderViewport (ar, pr, kb, sr) = do
 
     let consumeAccum acc s
             | acc >= secPerFrame =
-                tickStateIO keys s >>= consumeAccum (acc - secPerFrame)
-            | otherwise = return (acc, s)
+                consumeAccum (acc - secPerFrame) $ tickState keys s
+            | otherwise = (acc, s)
 
         frameTime = min (current - prev) maxFrameTime
 
-    (accum', s') <- readIORef sr >>= consumeAccum (accum + frameTime)
+    (accum', s') <- fmap (consumeAccum (accum + frameTime)) $ readIORef sr
 
     writeIORef sr s'
     writeIORef ar accum'

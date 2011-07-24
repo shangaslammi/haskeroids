@@ -36,7 +36,7 @@ data NewParticle = NewParticle
     , npSize      :: SizeRange
     }
 
-type RandomParticle = IO Particle
+type RandomParticle = Random Particle
 type Direction      = Float
 type Spread         = Float
 type SpeedRange     = (Float, Float)
@@ -87,7 +87,7 @@ addParticles n = tell . replicate n
 runParticleGen :: ParticleGen a -> (a, [NewParticle])
 runParticleGen = runWriter
 
-initNewParticles :: [NewParticle] -> ParticleSystem -> IO ParticleSystem
+initNewParticles :: [NewParticle] -> ParticleSystem -> Random ParticleSystem
 initNewParticles nps (ParticleSystem ps) = do
     p <- mapM initParticle nps
     return $ ParticleSystem $ p ++ ps

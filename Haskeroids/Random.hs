@@ -6,13 +6,24 @@ module Haskeroids.Random
     , randomAngle
     , randomElliptical
     , nrandomR
+    , initRandomGen
+    , runRandom
+    , Random
+    , RandomGen
     ) where
 
 import qualified System.Random as R
 import Control.Monad (liftM2, replicateM)
 import Control.Monad.State
 
-newtype Random a = Random { runR :: State (R.StdGen) a} deriving Monad
+type RandomGen = R.StdGen
+newtype Random a = Random { runR :: State RandomGen a} deriving Monad
+
+initRandomGen :: Int -> RandomGen
+initRandomGen = R.mkStdGen
+
+runRandom :: Random a -> RandomGen -> (a, RandomGen)
+runRandom r = runState (runR r)
 
 randomBetween :: R.Random a => (a,a) -> Random a
 randomBetween b = Random $ do

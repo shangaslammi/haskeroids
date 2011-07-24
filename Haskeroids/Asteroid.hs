@@ -28,7 +28,7 @@ data Asteroid = Asteroid
     , asteroidLines :: [LineSegment]
     }
 
-type RandomAsteroid = IO Asteroid
+type RandomAsteroid = Random Asteroid
 
 instance LineRenderable Asteroid where
     interpolatedLines f (Asteroid sz b _ lns) = map (transform b') lns where
@@ -130,7 +130,7 @@ genInitialAsteroid = randomElliptical xb yb >>= randomAsteroid Large where
     yb = (140, 300)
 
 -- | Generate the line segments for an asteroid size
-genAsteroidLines :: Size -> IO [LineSegment]
+genAsteroidLines :: Size -> Random [LineSegment]
 genAsteroidLines sz = do
     let numPts = numVertices sz
         r      = radius sz

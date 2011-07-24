@@ -1,15 +1,17 @@
 module Haskeroids.State
     ( GameState(..)
     , initialGameState
-    , tickStateIO
+    , tickState
     ) where
 
-import Data.List (partition, replicate)
+import Data.List (partition)
+import Control.Monad (replicateM)
 
 import Haskeroids.Player
 import Haskeroids.Bullet
 import Haskeroids.Asteroid
 import Haskeroids.Particles
+import Haskeroids.Random
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard (Keyboard)
 
@@ -19,8 +21,8 @@ data GameState = GameState
     , stateAsteroids :: [Asteroid]
     , stateBullets   :: [Bullet]
     , stateParticles :: ParticleSystem
-    , newAsteroids   :: [RandomAsteroid]
-    }
+    , stateRandom    :: RandomGen
+    } | NewGame
 
 instance LineRenderable GameState where
     interpolatedLines f (GameState p a b s _) = pls ++ als ++ bls ++ sls where
@@ -31,46 +33,43 @@ instance LineRenderable GameState where
 
 -- | Generate the initial game state
 initialGameState :: GameState
-initialGameState = GameState
-    { statePlayer    = initPlayer
-    , stateAsteroids = []
-    , stateBullets   = []
-    , stateParticles = initParticleSystem
-    , newAsteroids   = replicate 3 genInitialAsteroid
-    }
-
--- | Initialize new random asteroids in the IO monad
-initNewAsteroids :: GameState -> IO GameState
-initNewAsteroids st = do
-    n <- sequence $ newAsteroids st
-    return st { stateAsteroids = n ++ stateAsteroids st }
-
--- | Function that combines pure calculations and initializing random
---   objects in the IO monad
-tickStateIO :: Keyboard -> GameState -> IO GameState
-tickStateIO kb s = do
-    (s',np) <- fmap (runParticleGen . tickState kb) $ initNewAsteroids s
-    ps <- initNewParticles np $ stateParticles s'
-    return s' { stateParticles = ps }
+initialGameState = NewGame
 
 -- | Tick state into a new game state
-tickState :: Keyboard -> GameState -> ParticleGen GameState
-tickState kb s@(GameState pl a b p _) = do
-    let a' = map updateAsteroid a
-    pl' <- tickPlayer kb pl >>= collidePlayer a'
+tickState :: Keyboard -> GameState -> GameState
+tickState kb NewGame = GameState
+    { statePlayer    = initPlayer
+    , stateAsteroids = a
+    , stateBullets   = []
+    , stateParticles = initParticleSystem
+    , stateRandom    = g
+    } where
+    (a, g) = runRandom (replicateM 3 genInitialAsteroid) $ initRandomGen 0
 
-    let b' = filter bulletActive . map updateBullet $ case playerBullet pl' of
-                Nothing -> b
-                Just x  -> x:b
-    (b'', a'') <- collideAsteroids b' a'
+tickState kb s@(GameState pl a b p g) = s'
+    { stateParticles = p'
+    , stateRandom    = g'
+    } where
+    np'      = initNewParticles np (stateParticles s')
+    (p', g') = runRandom np' $ stateRandom s'
+    (s',np)  = runParticleGen $ do
+        let a' = map updateAsteroid a
+        pl' <- tickPlayer kb pl >>= collidePlayer a'
 
-    let (aa, ad) = partition asteroidAlive a''
-    na <- mapM spawnNewAsteroids ad
+        let b' = updateBullets $ case playerBullet pl' of
+                    Nothing -> b
+                    Just x  -> x:b
+        (b'', a'') <- collideAsteroids b' a'
 
-    return s
-      { statePlayer    = pl'
-      , stateAsteroids = aa
-      , stateBullets   = b''
-      , stateParticles = tickParticles p
-      , newAsteroids   = concat na
-      }
+        let (aa, ad) = partition asteroidAlive a''
+        na <- mapM spawnNewAsteroids ad
+
+        let (na', g') = runRandom (sequence $ concat na) g
+
+        return s
+          { statePlayer    = pl'
+          , stateAsteroids = na' ++ aa
+          , stateBullets   = b''
+          , stateParticles = tickParticles p
+          , stateRandom    = g'
+          }
