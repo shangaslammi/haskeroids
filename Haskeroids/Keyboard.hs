@@ -1,8 +1,9 @@
-module Haskeroids.Keyboard (
-    Keyboard,
-    initKeyboard,
-    handleKeyEvent,
-    isKeyDown) where
+module Haskeroids.Keyboard
+    ( Keyboard
+    , initKeyboard
+    , handleKeyEvent
+    , isKeyDown
+    ) where
 
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -17,9 +18,14 @@ initKeyboard = Keyboard Set.empty
 
 -- | Record a key state change in the given Keyboard
 handleKeyEvent :: Key -> KeyState -> Keyboard -> Keyboard
-handleKeyEvent k ks (Keyboard s) = case ks of
-    Up   -> Keyboard $ Set.delete k s
-    Down -> Keyboard $ Set.insert k s
+handleKeyEvent k Up   = addKey k
+handleKeyEvent k Down = removeKey k
+
+addKey :: Key -> Keyboard -> Keyboard
+addKey k (Keyboard s) = Keyboard $ Set.insert k s
+
+removeKey :: Key -> Keyboard -> Keyboard
+removeKey k (Keyboard s) = Keyboard $ Set.delete k s
 
 -- | Test if a key is currently held down in the given Keyboard
 isKeyDown :: Keyboard -> Key -> Bool
