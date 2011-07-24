@@ -23,10 +23,11 @@ data GameState = GameState
     }
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a b _ _) = plines ++ alines ++ blines where
-        plines = interpolatedLines f p
-        alines = concatMap (interpolatedLines f) a
-        blines = concatMap (interpolatedLines f) b
+    interpolatedLines f (GameState p a b s _) = pls ++ als ++ bls ++ sls where
+        pls = interpolatedLines f p
+        als = concatMap (interpolatedLines f) a
+        bls = concatMap (interpolatedLines f) b
+        sls = interpolatedLines f s
 
 -- | Generate the initial game state
 initialGameState :: GameState
