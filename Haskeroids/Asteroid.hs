@@ -47,9 +47,9 @@ radius Large  = 70
 
 -- | Hitpoints for an asteroid
 maxHits :: Size -> Int
-maxHits Small  = 4
-maxHits Medium = 8
-maxHits Large  = 16
+maxHits Small  = 3
+maxHits Medium = 6
+maxHits Large  = 9
 
 -- | Number of vertices for an asteroid
 numVertices :: Size -> Int
