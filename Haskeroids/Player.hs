@@ -80,13 +80,15 @@ tickPlayer kb p@(Player body alive _ rof)
         newBullet = initBullet (bodyPos body) (bodyAngle body)
         key       = isKeyDown kb
 
-        emitEngineParticles = addParticles 3 $ NewParticle
-            { npPosition  = bodyPos body'
+        emitDir   = bodyAngle body + pi
+
+        emitEngineParticles = addParticles 2 $ NewParticle
+            { npPosition  = bodyPos body /+/ polar (shipSize/3.0) emitDir
             , npRadius    = 0
-            , npDirection = -(bodyAngle body')
-            , npSpread    = pi/4.0
-            , npSpeed     = (1.0, 3.0)
-            , npLifeTime  = (20, 50)
+            , npDirection = emitDir
+            , npSpread    = pi/6.0
+            , npSpeed     = (1.0, 4.0)
+            , npLifeTime  = (5, 15)
             }
 
 -- | Test collision between the player ship and a list of Colliders
