@@ -10,9 +10,9 @@ translatePt (x,y) (x',y') = (x+x', y+y')
 
 -- | Rotate a point around the origo
 rotatePt :: Float -> Vec2 -> Vec2
-rotatePt a (x,y) = (x', y')
-    where x' = x * cos a - y * sin a
-          y' = x * sin a + y * cos a
+rotatePt a (x,y) = (x', y') where
+    x' = x * cos a - y * sin a
+    y' = x * sin a + y * cos a
 
 -- | Apply a point transformation function to a line segment
 applyXform :: (Vec2 -> Vec2) -> LineSegment -> LineSegment
