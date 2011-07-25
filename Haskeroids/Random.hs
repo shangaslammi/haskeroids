@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Haskeroids.Random
     ( randomBracket
     , randomBetween
@@ -13,11 +13,15 @@ module Haskeroids.Random
     ) where
 
 import qualified System.Random as R
-import Control.Monad (liftM2, replicateM)
+import Control.Monad (liftM2, replicateM, Monad)
 import Control.Monad.State
 
 type RandomGen = R.StdGen
-newtype Random a = Random { runR :: State RandomGen a} deriving Monad
+newtype Random a = Random { runR :: State RandomGen a}
+
+instance Monad Random where
+    return a = Random (return a)
+    (Random a) >>= b = Random $ a >>= (runR . b)
 
 initRandomGen :: Int -> RandomGen
 initRandomGen = R.mkStdGen
