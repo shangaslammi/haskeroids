@@ -9,24 +9,39 @@ import Haskeroids.Geometry
 import System.IO
 import Control.Monad (liftM2)
 import Control.Monad.State
+import Control.Arrow (second)
+import Data.List
+import Data.Map (Map)
 import qualified Data.Set as S
+import qualified Data.Map as M
 
+newtype Font = Font { toMap :: Map Char Glyph }
+type Glyph = [LineSegment]
 
-data Font = Font
 type FontSize = Float
-type ParsedGlyph = ((Int,Int),[Int],[LineDef])
+
+type GlyphInfo = ((Int,Int),[Int],[LineDef])
 type LineDef = ((Int,Int), (Char,Int))
 
 loadFont :: FilePath -> IO Font
 loadFont = fmap parseFont . readFile
 
 parseFont :: String -> Font
-parseFont s = undefined
+parseFont s = Font $ M.fromList assocs where
+    assocs = zip codepage glyphs
+    (codepage:lns) = lines s
+    glyphs = map (mkCharLines . analyzeGlyph) $ splitChars lns
 
 charLines :: Font -> FontSize -> Char -> [LineSegment]
 charLines = undefined
 
-analyzeGlyph :: [String] -> ParsedGlyph
+splitChars :: [String] -> [[String]]
+splitChars ls = split $ transpose ls where
+    split = unfoldr go
+    go [] = Nothing
+    go xs = Just . second tail . break (=="   ") $ xs
+
+analyzeGlyph :: [String] -> GlyphInfo
 analyzeGlyph l = ((w,h),cols,lns) where
     w    = length l
     h    = length (head l)
@@ -64,7 +79,7 @@ analyzeGlyph l = ((w,h),cols,lns) where
     charAt (r,c) = (l !! c) !! r
     rm p = modify $ S.delete p
 
-mkCharLines :: ParsedGlyph -> [LineSegment]
+mkCharLines :: GlyphInfo -> [LineSegment]
 mkCharLines ((w,h),cols,lns) = map mkLine lns where
     mkLine (sp,(d,l)) = LineSegment ((startPoint sp d),(endPoint sp d l))
     startPoint (r,c) d   = case d of
