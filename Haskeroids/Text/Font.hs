@@ -12,6 +12,7 @@ import Control.Monad (liftM2)
 import Control.Monad.State
 import Control.Arrow (second)
 import Data.List
+import Data.Char (toLower)
 import Data.Map (Map)
 import qualified Data.Set as S
 import qualified Data.Map as M
@@ -34,7 +35,7 @@ parseFont s = Font $ M.fromList assocs where
     glyphs = map (mkCharLines . analyzeGlyph) $ splitChars lns
 
 charLines :: Font -> FontSize -> Char -> [LineSegment]
-charLines (Font m) sz c = scaleLines sz $ M.findWithDefault [] c m
+charLines (Font m) sz c = scaleLines sz $ M.findWithDefault [] (toLower c) m
 
 scaleLines :: FontSize -> [LineSegment] -> [LineSegment]
 scaleLines sz = map $ applyXform (sz */)
