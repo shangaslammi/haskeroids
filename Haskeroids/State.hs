@@ -14,6 +14,7 @@ import Haskeroids.Particles
 import Haskeroids.Random
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard (Keyboard)
+import Haskeroids.Text
 
 -- | Data type for tracking game state
 data GameState = GameState

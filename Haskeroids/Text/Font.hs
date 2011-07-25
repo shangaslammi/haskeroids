@@ -2,6 +2,8 @@
 module Haskeroids.Text.Font
     ( loadFont
     , charLines
+    , Font
+    , FontSize
     ) where
 
 import Haskeroids.Geometry
