@@ -5,6 +5,7 @@ module Haskeroids.Text.Font
     ) where
 
 import Haskeroids.Geometry
+import Haskeroids.Geometry.Transform
 
 import System.IO
 import Control.Monad (liftM2)
@@ -33,7 +34,10 @@ parseFont s = Font $ M.fromList assocs where
     glyphs = map (mkCharLines . analyzeGlyph) $ splitChars lns
 
 charLines :: Font -> FontSize -> Char -> [LineSegment]
-charLines = undefined
+charLines (Font m) sz c = scaleLines sz $ M.findWithDefault [] c m
+
+scaleLines :: FontSize -> [LineSegment] -> [LineSegment]
+scaleLines sz = map $ applyXform (sz */)
 
 splitChars :: [String] -> [[String]]
 splitChars ls = split $ transpose ls where
