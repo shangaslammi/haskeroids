@@ -29,12 +29,13 @@ data GameState = GameState
     } | NewGame Font
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a b s _ _ _)
-        = pls ++ als ++ bls ++ sls where
+    interpolatedLines f (GameState p a b s t _ _)
+        = pls ++ als ++ bls ++ sls ++ tls where
         pls = interpolatedLines f p
         als = concatMap (interpolatedLines f) a
         bls = concatMap (interpolatedLines f) b
         sls = interpolatedLines f s
+        tls = concatMap (interpolatedLines f) t
 
 -- | Generate the initial game state
 initialGameState :: Font -> GameState
@@ -72,12 +73,17 @@ tickState kb s@(GameState pl a b p t g f) = s'
         na <- mapM spawnNewAsteroids ad
 
         let (na', g') = runRandom (sequence $ concat na) g
+            t'
+                | playerAlive pl' && null t = [gameOverText]
+                | otherwise                 = t
+            gameOverText = mkText f 50 "game over"
 
         return s
           { statePlayer    = pl'
           , stateAsteroids = na' ++ aa
           , stateBullets   = b''
           , stateParticles = tickParticles p
+          , stateTexts     = t'
           , stateRandom    = g'
           , stateFont      = f
           }

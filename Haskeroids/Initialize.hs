@@ -4,7 +4,6 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
 import Haskeroids.Callbacks
-import Haskeroids.Text.Font
 
 -- | Set up the main application window
 initializeWindow = do

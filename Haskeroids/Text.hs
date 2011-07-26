@@ -10,4 +10,4 @@ mkText :: Font -> FontSize -> String -> Text
 mkText = undefined
 
 instance LineRenderable Text where
-    interpolatedLines = undefined
+    interpolatedLines f t = []
