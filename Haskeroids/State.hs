@@ -15,6 +15,7 @@ import Haskeroids.Random
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard (Keyboard)
 import Haskeroids.Text
+import Haskeroids.Text.Font
 
 -- | Data type for tracking game state
 data GameState = GameState
@@ -22,32 +23,37 @@ data GameState = GameState
     , stateAsteroids :: [Asteroid]
     , stateBullets   :: [Bullet]
     , stateParticles :: ParticleSystem
+    , stateTexts     :: [Text]
     , stateRandom    :: RandomGen
-    } | NewGame
+    , stateFont      :: Font
+    } | NewGame Font
 
 instance LineRenderable GameState where
-    interpolatedLines f (GameState p a b s _) = pls ++ als ++ bls ++ sls where
+    interpolatedLines f (GameState p a b s _ _ _)
+        = pls ++ als ++ bls ++ sls where
         pls = interpolatedLines f p
         als = concatMap (interpolatedLines f) a
         bls = concatMap (interpolatedLines f) b
         sls = interpolatedLines f s
 
 -- | Generate the initial game state
-initialGameState :: GameState
+initialGameState :: Font -> GameState
 initialGameState = NewGame
 
 -- | Tick state into a new game state
 tickState :: Keyboard -> GameState -> GameState
-tickState kb NewGame = GameState
+tickState kb (NewGame f) = GameState
     { statePlayer    = initPlayer
     , stateAsteroids = a
     , stateBullets   = []
     , stateParticles = initParticleSystem
+    , stateTexts     = []
     , stateRandom    = g
+    , stateFont      = f
     } where
     (a, g) = runRandom (replicateM 3 genInitialAsteroid) $ initRandomGen 0
 
-tickState kb s@(GameState pl a b p g) = s'
+tickState kb s@(GameState pl a b p t g f) = s'
     { stateParticles = p'
     , stateRandom    = g'
     } where
@@ -73,4 +79,5 @@ tickState kb s@(GameState pl a b p g) = s'
           , stateBullets   = b''
           , stateParticles = tickParticles p
           , stateRandom    = g'
+          , stateFont      = f
           }
