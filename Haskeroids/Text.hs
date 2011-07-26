@@ -33,5 +33,6 @@ mkText f sz s = Text
 
 
 setCenterPos :: Vec2 -> Text -> Text
-setCenterPos = undefined
+setCenterPos (cx,cy) (Text b w h ls) = Text b' w h ls where
+    b'  = b { bodyPos = (cx-w/2,cy-h/2) }
 
