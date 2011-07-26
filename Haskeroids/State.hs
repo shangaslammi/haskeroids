@@ -74,9 +74,9 @@ tickState kb s@(GameState pl a b p t g f) = s'
 
         let (na', g') = runRandom (sequence $ concat na) g
             t'
-                | playerAlive pl' && null t = [gameOverText]
-                | otherwise                 = t
-            gameOverText = mkText f 50 "game over"
+                | not (playerAlive pl') && null t = [gameOverText]
+                | otherwise                       = t
+            gameOverText = setTextCenter (400,300) $ mkText f 50 "game over"
 
         return s
           { statePlayer    = pl'

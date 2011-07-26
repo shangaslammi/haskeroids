@@ -1,11 +1,17 @@
 
-module Haskeroids.Text where
+module Haskeroids.Text
+    ( Text
+    , mkText
+    , setTextCenter
+    ) where
 
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
 import Haskeroids.Geometry.Transform
 import Haskeroids.Render
 import Haskeroids.Text.Font
+
+import Data.List
 
 data Text = Text
     { textBody   :: Body
@@ -21,18 +27,19 @@ instance LineRenderable Text where
 mkText :: Font -> FontSize -> String -> Text
 mkText f sz s = Text
     { textBody   = initBody (0,0) 0 (0,0) 0
-    , textWidth  = sz * len + (sz*0.1) * (len - 1)
+    , textWidth  = sz * len + (sz*0.2) * (len - 1)
     , textHeight = sz
     , textLines  = lns
     } where
     len = fromIntegral $ length s
-    lns = fst . foldr go ([],0) . map (charLines f sz) $ s
+    lns = fst . foldl' go ([],0) . map (charLines f sz) $ s
 
-    go l (ls,x) = (offset x l ++ ls, x + sz * 1.1)
+    go (ls,x) l = (offset x l ++ ls, x + sz * 1.2)
     offset x ls = map (applyXform $ translatePt (x,0)) ls
 
 
-setCenterPos :: Vec2 -> Text -> Text
-setCenterPos (cx,cy) (Text b w h ls) = Text b' w h ls where
-    b'  = b { bodyPos = (cx-w/2,cy-h/2) }
+setTextCenter :: Vec2 -> Text -> Text
+setTextCenter (cx,cy) (Text b w h ls) = Text b' w h ls where
+    b'  = b { bodyPos = pos, prevPos = pos }
+    pos = (cx-w/2,cy-h/2)
 
