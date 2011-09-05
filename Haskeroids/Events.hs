@@ -1,16 +1,17 @@
 
 module Haskeroids.Events
     ( GameEvent(..)
+    , Events
     , newAsteroid
     , newParticles
     , newBullet
-    , runGame
+    , runEvents
     ) where
 
 import Control.Monad
 
-import Haskeroids.Bullet
-import Haskeroids.Asteroid
+import {-# SOURCE #-} Haskeroids.Bullet
+import {-# SOURCE #-} Haskeroids.Asteroid
 import Haskeroids.Particles
 
 data GameEvent
@@ -18,26 +19,26 @@ data GameEvent
     | NewParticles (ParticleGen ())
     | NewBullet Bullet
 
-data GameMonad v = Return v | EmitEvent GameEvent (GameMonad v)
+data Events v = Return v | EmitEvent GameEvent (Events v)
 
-instance Monad GameMonad where
+instance Monad Events where
     return          = Return
     (Return x)      >>= f = f x
     (EmitEvent e m) >>= f = EmitEvent e (m >>= f)
 
-emit :: GameEvent -> GameMonad ()
+emit :: GameEvent -> Events ()
 emit ev = EmitEvent ev (Return ())
 
-newAsteroid :: RandomAsteroid -> GameMonad ()
+newAsteroid :: RandomAsteroid -> Events ()
 newAsteroid = emit . NewAsteroid
 
-newParticles :: ParticleGen () -> GameMonad ()
-newParticles = emit . NewParticles
+newParticles :: Int -> NewParticle -> Events ()
+newParticles n = emit . NewParticles . addParticles n
 
-newBullet :: Bullet -> GameMonad ()
+newBullet :: Bullet -> Events ()
 newBullet = emit . NewBullet
 
-runGame :: GameMonad v -> (v, [GameEvent])
-runGame (Return x) = (x, [])
-runGame (EmitEvent e m) = (x, e:es) where
-    (x,es) = runGame m
+runEvents :: Events v -> (v, [GameEvent])
+runEvents (Return x) = (x, [])
+runEvents (EmitEvent e m) = (x, e:es) where
+    (x,es) = runEvents m

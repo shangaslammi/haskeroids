@@ -27,8 +27,8 @@ data GameResources = GameResources
 
 data GameUI = GameUI
 
-runEvents :: (GameState, RandomGen) -> [GameEvent] -> (GameState, RandomGen)
-runEvents = foldr step where
+processEvents :: (GameState, RandomGen) -> [GameEvent] -> (GameState, RandomGen)
+processEvents = foldr step where
     step ev (gs@(GameState go@(GameObjects pl bs as) ps ui),rng) = case ev of
 
         NewAsteroid ra  -> (gs {objects = go {asteroids = a:as}}, rng') where

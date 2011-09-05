@@ -7,6 +7,7 @@ module Haskeroids.Bullet
 
 import Haskeroids.Render
 import Haskeroids.Collision
+import Haskeroids.Events
 import Haskeroids.Particles
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
@@ -47,7 +48,7 @@ instance Collider Bullet where
         let body    = bulletBody b
             emitDir = bodyAngle body + pi
 
-        addParticles 5 NewParticle
+        newParticles 5 NewParticle
             { npPosition  = bodyPos body
             , npRadius    = 3
             , npDirection = emitDir

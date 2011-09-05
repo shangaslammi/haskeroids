@@ -9,14 +9,16 @@ module Haskeroids.Asteroid
     , asteroidAlive
     ) where
 
+import Haskeroids.Collision
+import Haskeroids.Events
 import Haskeroids.Geometry
 import Haskeroids.Geometry.Body
-import Haskeroids.Render
-import Haskeroids.Collision
-import Haskeroids.Random
 import Haskeroids.Particles
+import Haskeroids.Random
+import Haskeroids.Render
 
-import Data.List (replicate, sort)
+import Control.Monad (replicateM_)
+import Data.List (sort)
 import Data.Foldable (foldrM)
 
 type Hitpoints = Int
@@ -58,8 +60,8 @@ numVertices Medium = 13
 numVertices Large  = 17
 
 -- | Initialize a new asteroid with the given position, velocity and rotation
-newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
-newAsteroid sz pos v r = Asteroid sz (initBody pos 0 v r) (maxHits sz)
+initAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
+initAsteroid sz pos v r = Asteroid sz (initBody pos 0 v r) (maxHits sz)
 
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
@@ -75,7 +77,7 @@ asteroidAlive = (0<).asteroidHits
 
 -- | Collide an asteroid against multiple colliders and return a new modified
 --   asteroid and a list of remaining colliders.
-collideAsteroid :: Collider c => [c] -> Asteroid -> ParticleGen ([c], Asteroid)
+collideAsteroid :: Collider c => [c] -> Asteroid -> Events ([c], Asteroid)
 collideAsteroid cs a = foldrM go ([], a) cs where
     go c (cs, a)
         | collides c a = collisionParticles c >> return (cs, damageAsteroid a)
@@ -83,24 +85,23 @@ collideAsteroid cs a = foldrM go ([], a) cs where
 
 -- | Collide a list of asteroids against a list of other colliders
 --   Returns the remaining colliders and damaged asteroids.
-collideAsteroids :: Collider c =>
-    [c] -> [Asteroid] -> ParticleGen ([c], [Asteroid])
+collideAsteroids :: Collider c => [c] -> [Asteroid] -> Events ([c], [Asteroid])
 collideAsteroids cs = foldrM go (cs,[]) where
     go a (cs,as) = do
         (cs',a') <- collideAsteroid cs a
         return (cs', a':as)
 
-
 -- | Spawn random asteroids
-spawnNewAsteroids :: Asteroid -> ParticleGen [RandomAsteroid]
+spawnNewAsteroids :: Asteroid -> Events ()
 spawnNewAsteroids a@(Asteroid sz b _ _) =
-    explosionParticles a >> return new where
+    explosionParticles a >> new where
     new
-        | sz == Small = []
-        | otherwise   = replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
+        | sz == Small = return ()
+        | otherwise   = replicateM_ 3 $ newAsteroid a
+        where a = randomAsteroid (pred sz) (bodyPos b)
 
-explosionParticles :: Asteroid -> ParticleGen ()
-explosionParticles (Asteroid sz b _ _) = addParticles n NewParticle
+explosionParticles :: Asteroid -> Events ()
+explosionParticles (Asteroid sz b _ _) = newParticles n NewParticle
     { npPosition  = bodyPos b
     , npRadius    = radius sz / 2.0
     , npDirection = 0
@@ -120,7 +121,7 @@ randomAsteroid sz pos = do
     rot     <- randomBracket (3.0/r)
     lns     <- genAsteroidLines sz
 
-    return $ newAsteroid sz (pos /+/ (dx,dy)) (vx,vy) rot lns
+    return $ initAsteroid sz (pos /+/ (dx,dy)) (vx,vy) rot lns
 
 
 -- | Generate an initial asteroid in the level
