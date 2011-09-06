@@ -3,7 +3,7 @@ module Haskeroids.Asteroid
     , RandomAsteroid
     , Size(..)
     , genInitialAsteroid
-    , updateAsteroid
+    , updateAsteroids
     , spawnNewAsteroids
     , collideAsteroids
     , asteroidAlive
@@ -64,6 +64,9 @@ newAsteroid sz pos v r = Asteroid sz (initBody pos 0 v r) (maxHits sz)
 -- | Update an asteroid's position
 updateAsteroid :: Asteroid -> Asteroid
 updateAsteroid a = a { asteroidBody = updateBody $ asteroidBody a }
+
+updateAsteroids :: [Asteroid] -> [Asteroid]
+updateAsteroids = map updateAsteroid
 
 -- | Reduce asteroid hitpoints by one
 damageAsteroid :: Asteroid -> Asteroid

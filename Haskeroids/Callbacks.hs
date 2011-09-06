@@ -12,12 +12,12 @@ import Graphics.UI.GLUT
 
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard
-import Haskeroids.State
+import Haskeroids.Game
 import Haskeroids.Text.Font
 
 type KeyboardRef = IORef Keyboard
 type TimeRef     = IORef POSIXTime
-type StateRef    = IORef GameState
+type StateRef    = IORef Game
 type AccumRef    = TimeRef
 type PrevTimeRef = TimeRef
 
