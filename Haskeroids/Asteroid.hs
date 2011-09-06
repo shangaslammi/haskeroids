@@ -3,8 +3,8 @@ module Haskeroids.Asteroid
     , RandomAsteroid
     , Size(..)
     , genInitialAsteroid
-    , updateAsteroids
-    , spawnNewAsteroids
+    , tickAsteroids
+    , splitAsteroid
     , collideAsteroids
     , asteroidAlive
     ) where
@@ -16,7 +16,8 @@ import Haskeroids.Collision
 import Haskeroids.Random
 import Haskeroids.Particles
 
-import Data.List (replicate, sort)
+import Control.Monad (replicateM)
+import Data.List (sort)
 import Data.Foldable (foldrM)
 
 type Hitpoints = Int
@@ -62,11 +63,11 @@ newAsteroid :: Size -> Vec2 -> Vec2 -> Float -> [LineSegment] -> Asteroid
 newAsteroid sz pos v r = Asteroid sz (initBody pos 0 v r) (maxHits sz)
 
 -- | Update an asteroid's position
-updateAsteroid :: Asteroid -> Asteroid
-updateAsteroid a = a { asteroidBody = updateBody $ asteroidBody a }
+tickAsteroid :: Asteroid -> Asteroid
+tickAsteroid a = a { asteroidBody = updateBody $ asteroidBody a }
 
-updateAsteroids :: [Asteroid] -> [Asteroid]
-updateAsteroids = map updateAsteroid
+tickAsteroids :: [Asteroid] -> [Asteroid]
+tickAsteroids = map tickAsteroid
 
 -- | Reduce asteroid hitpoints by one
 damageAsteroid :: Asteroid -> Asteroid
@@ -95,12 +96,12 @@ collideAsteroids cs = foldrM go (cs,[]) where
 
 
 -- | Spawn random asteroids
-spawnNewAsteroids :: Asteroid -> ParticleGen [RandomAsteroid]
-spawnNewAsteroids a@(Asteroid sz b _ _) =
-    explosionParticles a >> return new where
-    new
-        | sz == Small = []
-        | otherwise   = replicate 3 $ randomAsteroid (pred sz) (bodyPos b)
+splitAsteroid :: Asteroid -> ParticleGen (Random [Asteroid])
+splitAsteroid a@(Asteroid sz b _ _) =
+    explosionParticles a >> return initNew where
+    initNew
+        | sz == Small = return []
+        | otherwise   = replicateM 3 $ randomAsteroid (pred sz) (bodyPos b)
 
 explosionParticles :: Asteroid -> ParticleGen ()
 explosionParticles (Asteroid sz b _ _) = addParticles n NewParticle

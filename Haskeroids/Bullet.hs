@@ -2,7 +2,7 @@
 module Haskeroids.Bullet
     ( Bullet
     , initBullet
-    , updateBullets
+    , tickBullets
     ) where
 
 import Haskeroids.Render
@@ -65,12 +65,12 @@ initBullet pos angle = Bullet bulletMaxLife body where
     pos' = pos /+/ polar 12.0 angle
 
 -- | Update a bullet to a new position
-updateBullet :: Bullet -> Bullet
-updateBullet (Bullet l b) = Bullet (l-1) $ updateBody b
+tickBullet :: Bullet -> Bullet
+tickBullet (Bullet l b) = Bullet (l-1) $ updateBody b
 
 -- | Update a list of bullets
-updateBullets :: [Bullet] -> [Bullet]
-updateBullets = filter bulletActive . map updateBullet
+tickBullets :: [Bullet] -> [Bullet]
+tickBullets = filter bulletActive . map tickBullet
 
 -- | Test wether a bullet is still active
 bulletActive :: Bullet -> Bool
