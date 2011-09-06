@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, TypeSynonymInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, TypeSynonymInstances, OverlappingInstances #-}
 module Haskeroids.Game where
 
 import Haskeroids.Player
@@ -73,6 +73,8 @@ tickState kb gs = tickGame gs where
         let newAsteroids = fmap concat $ mapM spawnNewAsteroids destroyed
         resolve newAsteroids >>= resolve . sequence >>= addAll
 
+        act tickParticles
+
 type GameState = State Game
 
 class GameData a where
@@ -139,7 +141,6 @@ instance (GameData a) => GameAction (a -> a) where
 
 instance (GameData a, GameData b) => GameAction (a -> b -> (a,b)) where
     act f = (f <$> getData <*> getData) >>= putData
-
 
 instance (GameData a, GameAction b) => GameAction (a -> b) where
     act f = (f <$> getData) >>= act
