@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, TypeSynonymInstances, OverlappingInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, TypeSynonymInstances #-}
+
 module Haskeroids.Game where
 
 import Haskeroids.Player
@@ -24,11 +25,12 @@ data Game = Game
     , particles :: ParticleSystem
     , texts     :: [Text]
     , randomGen :: RandomGen
-    , font      :: Font
-    } | NewGame Font
+    } | NewGame
+
+data GameResources = Resources Font
 
 instance LineRenderable Game where
-    interpolatedLines f (Game p a b s t _ _)
+    interpolatedLines f (Game p a b s t _)
         = pls ++ als ++ bls ++ sls ++ tls where
         pls = interpolatedLines f p
         als = concatMap (interpolatedLines f) a
@@ -37,23 +39,22 @@ instance LineRenderable Game where
         tls = concatMap (interpolatedLines f) t
 
 -- | Generate the initial game state
-initialGameState :: Font -> Game
+initialGameState :: Game
 initialGameState = NewGame
 
 -- | Tick state into a new game state
-tickState :: Keyboard -> Game -> Game
-tickState _ (NewGame f) = Game
+tickState :: GameResources -> Keyboard -> Game -> Game
+tickState _ _ NewGame = Game
     { player    = initPlayer
     , asteroids = a
     , bullets   = []
     , particles = initParticleSystem
     , texts     = []
     , randomGen = g
-    , font      = f
     } where
     (a, g) = runRandom (replicateM 3 genInitialAsteroid) $ initRandomGen 0
 
-tickState kb gs = tickGame gs where
+tickState (Resources font) kb gs = tickGame gs where
     tickGame = S.execState $ do
         runUpdate $ tickPlayer kb
         ask playerBullet >>= possibly add
@@ -79,7 +80,6 @@ tickState kb gs = tickGame gs where
         update particles
 
     addText txt size pos = do
-        font <- get
         add $ setTextCenter pos $ mkText font size txt
 
 type GameState = S.State Game
@@ -123,10 +123,6 @@ instance GameData RandomGen where
 instance GameData [Text] where
     get = fmap texts S.get
     put ts = S.modify $ \g -> g {texts = ts}
-
-instance GameData Font where
-    get = fmap font S.get
-    put f = S.modify $ \g -> g {font = f}
 
 instance ListData Asteroid where
 instance ListData Bullet where

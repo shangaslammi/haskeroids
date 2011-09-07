@@ -13,7 +13,6 @@ import Graphics.UI.GLUT
 import Haskeroids.Render (LineRenderable(..))
 import Haskeroids.Keyboard
 import Haskeroids.Game
-import Haskeroids.Text.Font
 
 type KeyboardRef = IORef Keyboard
 type TimeRef     = IORef POSIXTime
@@ -35,12 +34,12 @@ initCallbackRefs = do
     accum <- newIORef secPerFrame
     prev  <- getPOSIXTime >>= newIORef
     keyb  <- newIORef initKeyboard
-    st    <- loadFont "font.txt" >>= newIORef . initialGameState
+    st    <- newIORef initialGameState
     return (accum, prev, keyb, st)
 
 -- | Run the game logic, render the view and swap display buffers
-renderViewport :: CallbackRefs -> IO ()
-renderViewport (ar, pr, kb, sr) = do
+renderViewport :: GameResources -> CallbackRefs -> IO ()
+renderViewport res (ar, pr, kb, sr) = do
     current <- getPOSIXTime
     accum   <- readIORef ar
     prev    <- readIORef pr
@@ -48,7 +47,7 @@ renderViewport (ar, pr, kb, sr) = do
 
     let consumeAccum acc s
             | acc >= secPerFrame =
-                consumeAccum (acc - secPerFrame) $ tickState keys s
+                consumeAccum (acc - secPerFrame) $ tickState res keys s
             | otherwise = (acc, s)
 
         frameTime = min (current - prev) maxFrameTime
