@@ -4,7 +4,7 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
 import Haskeroids.Callbacks
-import Haskeroids.Game (GameResources)
+import Haskeroids.Game (GameResources(..))
 import Haskeroids.Text.Font
 
 -- | Set up the main application window
@@ -47,4 +47,4 @@ initializeCallbacks = do
     displayCallback $= renderViewport res refs
 
 -- | Load game resources
-initializeResources = fmap GameResources $ loadFont "font.txt"
+initializeResources = fmap Resources $ loadFont "font.txt"
