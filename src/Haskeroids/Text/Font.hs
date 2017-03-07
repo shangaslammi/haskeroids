@@ -1,4 +1,4 @@
-
+{-# LANGUAGE FlexibleContexts #-}
 module Haskeroids.Text.Font
     ( loadFont
     , charLines

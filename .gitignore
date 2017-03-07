@@ -5,3 +5,6 @@
 *.hc
 main
 dist
+.stack-work
+
+
