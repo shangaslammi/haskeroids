@@ -7,14 +7,42 @@ License-file:       LICENSE
 Author:             Sami Hangaslammi
 Maintainer:         Sami Hangaslammi <shang@iki.fi>
 Build-Type:         Simple
-Cabal-Version:      >=1.2
+Category:           Game
+Cabal-Version:      >=1.10
 Data-Files:         font.txt
 Extra-Source-Files: font.txt
 
-Executable haskeroids
-    Main-is:            main.hs
-    Build-Depends:      base >= 4, transformers >= 0.2.2.0,
-                        mtl >= 2.0.1.0, GLUT >= 2.1.2.1,
-                        containers >= 0.3.0.0, OpenGL >= 2.2.3.0,
-                        random >= 1.0.0.2, time >= 1.1.4
+executable haskeroids
+  main-is:        Main.hs
+  hs-source-dirs: app
+  build-depends:  base >= 4
+               ,  haskeroids
+               ,  GLUT
 
+library
+  exposed-modules: Haskeroids.Asteroid
+                 , Haskeroids.Bullet
+                 , Haskeroids.Callbacks
+                 , Haskeroids.Collision
+                 , Haskeroids.Controls
+                 , Haskeroids.Geometry
+                 , Haskeroids.Geometry.Body
+                 , Haskeroids.Geometry.Transform
+                 , Haskeroids.Initialize
+                 , Haskeroids.Keyboard
+                 , Haskeroids.Particles
+                 , Haskeroids.Player
+                 , Haskeroids.Random
+                 , Haskeroids.Render
+                 , Haskeroids.State
+                 , Haskeroids.Text
+                 , Haskeroids.Text.Font
+  hs-source-dirs:  src
+  build-Depends:   base >= 4 && <= 5
+               ,   transformers >= 0.2.2.0
+               ,   mtl >= 2.0.1.0
+               ,   GLUT >= 2.1.2.1
+               ,   containers >= 0.3.0.0
+               ,   OpenGL >= 2.2.3.0
+               ,   random >= 1.0.0.2
+               ,   time >= 1.1.4

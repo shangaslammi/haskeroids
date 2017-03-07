@@ -6,6 +6,7 @@ import Graphics.UI.GLUT
 import Haskeroids.Callbacks
 
 -- | Set up the main application window
+initializeWindow :: IO Window
 initializeWindow = do
     _ <- getArgsAndInitialize
     initialWindowSize  $= Size 800 600
@@ -13,6 +14,7 @@ initializeWindow = do
     createWindow "Haskeroids"
 
 -- | Set up the initial OpenGL parameters
+initializeOpenGL :: IO ()
 initializeOpenGL = do
     -- Disable depth checking as we won't be needing it in 2D
     depthMask $= Disabled
@@ -37,6 +39,7 @@ initializeOpenGL = do
     clearColor $= Color4 0.0 0.0 0.1 1.0
 
 -- | Set up GLUT callbacks
+initializeCallbacks :: IO ()
 initializeCallbacks = do
     refs <- initCallbackRefs
 

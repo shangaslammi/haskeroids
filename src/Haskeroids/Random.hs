@@ -17,10 +17,17 @@ import Control.Monad (liftM2, replicateM, Monad)
 import Control.Monad.State
 
 type RandomGen = R.StdGen
+
 newtype Random a = Random { runR :: State RandomGen a}
 
+instance Functor Random where
+  fmap f = Random . fmap f . runR
+
+instance Applicative Random where
+  pure = Random . pure
+  (Random statef) <*> (Random statex) = Random (statef <*> statex)
+
 instance Monad Random where
-    return a = Random (return a)
     (Random a) >>= b = Random $ a >>= (runR . b)
 
 initRandomGen :: Int -> RandomGen
